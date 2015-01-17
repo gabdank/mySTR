@@ -98,7 +98,7 @@ public class kmerInformator {
 				endTime = System.currentTimeMillis();
 				System.out.println("PROCESSED "+mone +" lines in BED, it took "+((endTime-startTime)/1000) +" seconds" );
 				startTime = endTime;
-				break;
+				//break;
 			}
 			
 
@@ -236,6 +236,10 @@ public class kmerInformator {
 				System.out.println("Finished to do the long flanks kmers");
 				System.out.println("Size of the long list:"+longFlanksKmerRepUnit2SetOfLocations.keySet().size());
 				System.out.println(longFlanksKmerRepUnit2SetOfLocations.keySet());
+				for (KmerRepeatUnitPair p : longFlanksKmerRepUnit2SetOfLocations.keySet()){
+					System.out.println(p+" : "+longFlanksKmerRepUnit2SetOfLocations.get(p));
+					
+				}
 				System.out.println();
 			}
 		}
