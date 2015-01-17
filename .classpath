@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="/home/gabdank/Programs/guava-18.0.jar"/>
 	<classpathentry kind="lib" path="/home/gabdank/Programs/trove-3.1a1/3.1a1/trove-3.1a1-src.jar"/>
 	<classpathentry kind="lib" path="/home/gabdank/Programs/trove-3.1a1/3.1a1/lib/trove-3.1a1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
