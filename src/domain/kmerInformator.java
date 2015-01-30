@@ -25,6 +25,21 @@ public class kmerInformator {
 
 	private TIntObjectMap<ArrayList<GenomicLocation>> repUnitIndex2ListOfLocations;
 
+	public TIntObjectMap<ArrayList<GenomicLocation>> getrepUnitLocationsMap(){
+		return repUnitIndex2ListOfLocations;
+	}
+	
+	public KmerMap getKmerMap() {
+		return kmerMap;
+	}
+
+
+	public Chromosome2IndexBiMap getChromoMap() {
+		return chromoMap;
+	}
+
+	
+
 	private HashMap<KmerRepeatUnitPair,HashSet<GenomicLocation>> immidiateFlanksKmerRepUnit2SetOfLocations;
 	private HashMap<KmerRepeatUnitPair,HashSet<GenomicLocation>> longFlanksKmerRepUnit2SetOfLocations;
 	
@@ -244,6 +259,33 @@ public class kmerInformator {
 			}
 		}
 	}
+
+	public RepUnitBiMap getRepeatMap() {
+		return repeatMap;
+	}
+
+	public void setRepeatMap(RepUnitBiMap repeatMap) {
+		this.repeatMap = repeatMap;
+	}
+
+	public int getNumberOfThreads() {
+		return numberOfThreads;
+	}
+
+	public void setNumberOfThreads(int numberOfThreads) {
+		this.numberOfThreads = numberOfThreads;
+	}
+
+	public HashMap<KmerRepeatUnitPair, HashSet<GenomicLocation>> getImmidiateFlanksKmerRepUnit2SetOfLocations() {
+		return immidiateFlanksKmerRepUnit2SetOfLocations;
+	}
+
+	
+	public HashMap<KmerRepeatUnitPair, HashSet<GenomicLocation>> getLongFlanksKmerRepUnit2SetOfLocations() {
+		return longFlanksKmerRepUnit2SetOfLocations;
+	}
+
+	
 
 	private void addRepeat2LocationMapping(String repeatUnitRepresentative,GenomicLocation loc){
 		addIndexLocationToMap(repeatMap.getIntForString(repeatUnitRepresentative), loc, repUnitIndex2ListOfLocations);
