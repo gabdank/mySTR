@@ -28,11 +28,11 @@ public class kmerInformator {
 	private HashMap<KmerRepeatUnitPair,HashSet<GenomicLocation>> immidiateFlanksKmerRepUnit2SetOfLocations;
 	private HashMap<KmerRepeatUnitPair,HashSet<GenomicLocation>> longFlanksKmerRepUnit2SetOfLocations;
 	
-	private TIntObjectMap<TIntIntMap> repeatUnit2ValidShortKmers;
-	private TIntObjectMap<TIntIntMap> repeatUnit2NotValidShortKmers;
+	private TIntObjectMap<TIntIntMap> repeatUnit2ValidShortKmers; //non functional, maps that are used during construction
+	private TIntObjectMap<TIntIntMap> repeatUnit2NotValidShortKmers;//non functional, maps that are used during construction
 	
-	private TIntObjectMap<TIntIntMap> repeatUnit2ValidLongKmers;
-	private TIntObjectMap<TIntIntMap> repeatUnit2NotValidLongKmers;
+	private TIntObjectMap<TIntIntMap> repeatUnit2ValidLongKmers;//non functional, maps that are used during construction
+	private TIntObjectMap<TIntIntMap> repeatUnit2NotValidLongKmers;//non functional, maps that are used during construction
 	
 	
 
@@ -126,7 +126,7 @@ public class kmerInformator {
 				//System.out.println(repeatMap.);
 				int repeatUnitIndex = repeatMap.getIntForString(representativeUnit);
 
-				// In order to not take into consederation k-mers that are repetitive and map all over the place - we are requiring some level of 
+				// In order to not take into consideration k-mers that are repetitive and map all over the place - we are requiring some level of 
 				// uniqueness. It means that currently any pair of ([k-mer],[representative repeat unit index]) that maps to over 5 
 				// genomic locations will be discarded - as not helpful for the mapping purposes.
 				// in order to be able to count the references of each pair we have to create a data structure that will keep them
