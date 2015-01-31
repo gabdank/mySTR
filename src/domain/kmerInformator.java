@@ -50,7 +50,7 @@ public class kmerInformator {
 	private TIntObjectMap<TIntIntMap> repeatUnit2NotValidLongKmers;//non functional, maps that are used during construction
 	
 	
-
+	// Number of threads - is the number of entries in the array of counters on the hash map data structure
 	public kmerInformator(int kLength, String chromosomeListFileName, String trfBedFileName, int numOfThreads) throws IOException{
 		numberOfThreads = numOfThreads;
 		System.out.println("Beginning generation of the k-mer map (String->int)");
@@ -128,15 +128,15 @@ public class kmerInformator {
 				String fullSeq = t.nextToken();				
 				int repeatStart = Integer.parseInt(t.nextToken());
 
-				GenomicLocation gl = new GenomicLocation(chromosomeIndex,position);
+				GenomicLocation gl = new GenomicLocation(chromosomeIndex,position,numberOfThreads);
 				//chromosomeIndex,position,fullSeq, representativeUnit.length(), repeatStart, repeatLength, numberOfThreads);				
 				
 				//System.out.println("Generated genomic location:");
 				//System.out.println(gl);
 
 				addRepeat2LocationMapping(representativeUnit,gl);
-				System.out.println(representativeUnit);
-				System.out.println(repUnitIndex2ListOfLocations.get(repeatMap.getIntForString("AAGCCT")));
+				//System.out.println(representativeUnit);
+				//System.out.println(repUnitIndex2ListOfLocations.get(repeatMap.getIntForString("AAGCCT")));
 				
 				//System.out.println(repeatMap.);
 				int repeatUnitIndex = repeatMap.getIntForString(representativeUnit);
@@ -160,8 +160,8 @@ public class kmerInformator {
 					repeatUnit2NotValidShortKmers.put(repeatUnitIndex,notValidShortKmersMap);
 				}
 				
-				System.out.println("validShortKmers:"+validShortKmersMap);
-				System.out.println("notValidShortKmers:"+notValidShortKmersMap);
+				//System.out.println("validShortKmers:"+validShortKmersMap);
+				//System.out.println("notValidShortKmers:"+notValidShortKmersMap);
 				
 				String nextToken = t.nextToken();
 				while (!nextToken.equals("$")){
@@ -176,7 +176,7 @@ public class kmerInformator {
 								notValidShortKmersMap.put(kmerIndexValue, 1);
 								validShortKmersMap.remove(kmerIndexValue);
 								// remove references to kmer from the locations?
-								System.out.println("REMOVING FROM SHORT!!!");
+								//System.out.println("REMOVING FROM SHORT!!!");
 								removeKmerUnitPairFromMapping(mappingPair,immidiateFlanksKmerRepUnit2SetOfLocations );
 								//removeKmerUnit2ImmidiateLocationMapping(mappingPair);
 
@@ -197,12 +197,12 @@ public class kmerInformator {
 					nextToken = t.nextToken();
 				}
 
-				System.out.println("Finished to do the short flanks kmers");
-				System.out.println("Key SET: "+immidiateFlanksKmerRepUnit2SetOfLocations.keySet());
-				for (KmerRepeatUnitPair p : immidiateFlanksKmerRepUnit2SetOfLocations.keySet()){
-					System.out.println(p+" : "+immidiateFlanksKmerRepUnit2SetOfLocations.get(p));
+				//System.out.println("Finished to do the short flanks kmers");
+				//System.out.println("Key SET: "+immidiateFlanksKmerRepUnit2SetOfLocations.keySet());
+				//for (KmerRepeatUnitPair p : immidiateFlanksKmerRepUnit2SetOfLocations.keySet()){
+				//	System.out.println(p+" : "+immidiateFlanksKmerRepUnit2SetOfLocations.get(p));
 					
-				}
+				//}
 				//System.out.println();
 				//System.out.println("CHECKING:"+immidiateFlanksKmerRepUnit2SetOfLocations.get(new KmerRepeatUnitPair(23, 242)));
 				//////////////////////////////////////////
@@ -228,7 +228,7 @@ public class kmerInformator {
 						if (validLongKmersMap.containsKey(kmerIndexValue)){ // not the first time encountering kmer
 							int numOfOccurrences = validLongKmersMap.get(kmerIndexValue);
 							if (numOfOccurrences>KMER_NON_UNIQUENESS_THRESHOLD){
-								System.out.println("REMOVING FROM LONG!!!");
+								//System.out.println("REMOVING FROM LONG!!!");
 								notValidLongKmersMap.put(kmerIndexValue, 1);
 								validLongKmersMap.remove(kmerIndexValue);
 								
@@ -248,14 +248,14 @@ public class kmerInformator {
 						}
 					}
 				}
-				System.out.println("Finished to do the long flanks kmers");
-				System.out.println("Size of the long list:"+longFlanksKmerRepUnit2SetOfLocations.keySet().size());
-				System.out.println(longFlanksKmerRepUnit2SetOfLocations.keySet());
-				for (KmerRepeatUnitPair p : longFlanksKmerRepUnit2SetOfLocations.keySet()){
-					System.out.println(p+" : "+longFlanksKmerRepUnit2SetOfLocations.get(p));
-					
-				}
-				System.out.println();
+				//System.out.println("Finished to do the long flanks kmers");
+				//System.out.println("Size of the long list:"+longFlanksKmerRepUnit2SetOfLocations.keySet().size());
+				//System.out.println(longFlanksKmerRepUnit2SetOfLocations.keySet());
+				//for (KmerRepeatUnitPair p : longFlanksKmerRepUnit2SetOfLocations.keySet()){
+				//	System.out.println(p+" : "+longFlanksKmerRepUnit2SetOfLocations.get(p));
+				//	
+				//}
+				//System.out.println();
 			}
 		}
 	}

@@ -1,8 +1,8 @@
 package domain;
 
 public class KmerRepeatUnitPair {
-	private int kmerID;
-	private int repeatUnitID;
+	private final int kmerID;
+	private final int repeatUnitID;
 	
 	public int getKmerID(){
 		return kmerID;				

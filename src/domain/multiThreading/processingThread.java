@@ -1,6 +1,8 @@
 package domain.multiThreading;
 
+import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,6 +20,7 @@ import org.biojava3.alignment.SubstitutionMatrixHelper;
 import org.biojava3.alignment.template.SubstitutionMatrix;
 import org.biojava3.core.sequence.compound.NucleotideCompound;
 
+import utils.SequenceUtils;
 import domain.GenomicLocation;
 import domain.KmerMap;
 import domain.KmerRepeatUnitPair;
@@ -87,7 +90,7 @@ public class processingThread implements Runnable{
 					startTime = endTime;
 
 				}
-				// DEBUGGNG purposes
+				// DEBUGGNG break option
 				/*if (b==20000){
 					System.out.println("FINISHED "+b+" LINES");
 					break;
@@ -111,6 +114,7 @@ public class processingThread implements Runnable{
 							kmerIndexMap, repeatIndexingMap, find_repetition,
 							allMaxScoresDistribution,
 							allUsedScoresDistribution,repetitionList);
+					break;
 				}
 				if (a==4){
 					a=0;
@@ -119,8 +123,8 @@ public class processingThread implements Runnable{
 			}
 
 
-		//	bw.close();
-		//	fw.close();
+			//	bw.close();
+			//	fw.close();
 			System.out.println("THREAD "+threadID + " finished on "+ fastq1+"\t"+fastq2);
 
 		}
@@ -128,16 +132,138 @@ public class processingThread implements Runnable{
 			e.printStackTrace();
 		}
 	}
-	
-	private void processRead(String line1, String line2, String id,
-			TIntObjectMap<HashSet<GenomicLocation>> shortKmerMap,
-			TIntObjectMap<HashSet<GenomicLocation>> longKmerMap,			
+
+	private void processRead(String line1, String mateRead, String id,
+			HashMap<KmerRepeatUnitPair, HashSet<GenomicLocation>> shortKmerMap,
+			HashMap<KmerRepeatUnitPair, HashSet<GenomicLocation>> longKmerMap,			
 			TIntObjectMap<ArrayList<GenomicLocation>> repMap,
 			KmerMap kmerIndexMap, RepUnitBiMap repeatIndexingMap,
 			FindRepetition find_repetition, 
 			int[] allMaxScoresDistribution, int[] allUsedScoresDistribution, RepetitionList repetition1)
 					throws IOException {
-	}
-	
 
+		System.out.println("processing read1:"+line1);
+		repetition1.emptyRepetitionList();
+		find_repetition.findMaximalRepetition(line1,repetition1);
+		find_repetition.extendMaximalRepetition(id, line1, repetition1);
+
+		// Ensure we are dealing with short tandem repeat (2..8bp long) and that the repeat length is at least 16bp long 
+		if (repetition1.get_max_repetition_unit_size()>1 && repetition1.get_max_repetition_unit_size()<9 && repetition1.get_max_repetition_length()>16){
+			String repeat1 = line1.substring(repetition1.get_max_repetition_left_index(),repetition1.get_max_repetition_left_index()+repetition1.get_max_repetition_unit_size());
+			if (!repeat1.contains("N")){
+				String representativeRepeat1 = SequenceUtils.getRepresentative(repeat1);
+				int repeatIndex1 = repeatIndexingMap.getIntForString(representativeRepeat1);
+				ArrayList<GenomicLocation> genomicLocations1 = repMap.get(repeatIndex1); 
+				if (genomicLocations1 != null){
+
+					String leftFlank = line1.substring(0,repetition1.get_max_repetition_left_index());
+					String rightFlank = line1.substring(repetition1.get_max_repetition_right_index());
+
+					String repeatSection = line1.substring(repetition1.get_max_repetition_left_index(),repetition1.get_max_repetition_right_index() );
+					
+			
+					if (leftFlank.length()>30){
+						leftFlank = leftFlank.substring(leftFlank.length()-30, leftFlank.length());
+					}
+					
+					if (rightFlank.length()>30){
+						rightFlank = rightFlank.substring(0,30);
+					}
+					
+					/*System.out.println("LEFT FLANK = "+leftFlank);
+					System.out.println("RIGHT FLANK = "+rightFlank);
+					System.out.println("REPEAT = "+repeatSection);
+					*/
+					TIntIntMap readFlankKmers = new TIntIntHashMap(); // map that will store all kmers coming from short flanks
+					TIntIntMap readPairKmers = new TIntIntHashMap(); // map that will store all kmers from the paired End read
+
+					HashSet<GenomicLocation> kmerUnitPairLocations;
+
+					for (int p=0;p<leftFlank.length()-11;p=p+1){
+						String twelveMer = leftFlank.substring(p,p+12);
+						if (!twelveMer.contains("N")){
+							int kmerIndex = kmerIndexMap.getIntForString(twelveMer);
+
+							kmerUnitPairLocations = shortKmerMap.get(new KmerRepeatUnitPair(kmerIndex, repeatIndex1));
+
+							if (kmerUnitPairLocations != null){										
+								if (!readFlankKmers.containsKey(kmerIndex)){
+									for (GenomicLocation gl : kmerUnitPairLocations){
+										gl.addOneToCounter(threadID);												
+									}
+									readFlankKmers.put(kmerIndex, 1);
+								}
+							}
+
+						}
+					}
+
+					for (int p=0;p<rightFlank.length()-11;p=p+1){
+						String twelveMer = rightFlank.substring(p,p+12);
+						if (!twelveMer.contains("N")){	
+							int kmerIndex = kmerIndexMap.getIntForString(twelveMer);
+							
+							kmerUnitPairLocations = shortKmerMap.get(new KmerRepeatUnitPair(kmerIndex, repeatIndex1));
+							if (kmerUnitPairLocations != null){							
+								if (!readFlankKmers.containsKey(kmerIndex)){
+									for (GenomicLocation gl : kmerUnitPairLocations){
+										gl.addOneToCounter(threadID);												
+									}
+									readFlankKmers.put(kmerIndex, 1);
+								}
+							}
+						}
+					}
+
+
+					//--------------------------------------------------------// WORKING HERE!!!					
+					// MAXIMUM FINDING				
+					double maxScore = -1.0;
+					double maxNumOfFlankKmers = readFlankKmers.keySet().size();								
+					double maxNumOfPairKmers = readPairKmers.keySet().size();	
+					
+				
+					int numOfLocations = genomicLocations1.size();
+					int[] scoresOfLocations=new int[numOfLocations];
+
+					if (maxNumOfFlankKmers>10){// we can rely solely on the short flank kmers - because there are enough of these
+						
+					}
+					else{ // we will have to use the paired end, because the flanks are too short 
+						
+					}
+					
+					//--------------------------------------------------------// WORKING HERE
+					
+					// COUNTER NULLIFICATION
+					int[] kmerKeys = readFlankKmers.keys();
+					// NULLIFICATION OF THE SHORT FLANK KMERS GENOMIC LOCATIONS
+					for (int in = 0;in<kmerKeys.length;in++){									
+						int kmerIndex = kmerKeys[in];
+						kmerUnitPairLocations = shortKmerMap.get(new KmerRepeatUnitPair(kmerIndex,repeatIndex1));
+						if (kmerUnitPairLocations != null){
+							for (GenomicLocation gLoc : kmerUnitPairLocations){
+								gLoc.nullifyCounter(threadID);
+							}
+						}
+					}
+					
+					kmerKeys = readPairKmers.keys();
+					// NULLIFICATION OF THE PAIRED END READ KMER GENOMIC LOCATIONS
+					for (int in = 0;in<kmerKeys.length;in++){									
+						int kmerIndex = kmerKeys[in];
+						kmerUnitPairLocations = longKmerMap.get(new KmerRepeatUnitPair(kmerIndex,repeatIndex1));
+						if (kmerUnitPairLocations != null){
+							for (GenomicLocation gLoc : kmerUnitPairLocations){
+								gLoc.nullifyCounter(threadID);
+							}
+						}
+					}
+
+				}
+
+			}
+
+		}
+	}
 }
