@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.StringTokenizer;
@@ -160,20 +161,20 @@ public class processingThread implements Runnable{
 					String rightFlank = line1.substring(repetition1.get_max_repetition_right_index());
 
 					String repeatSection = line1.substring(repetition1.get_max_repetition_left_index(),repetition1.get_max_repetition_right_index() );
-					
-			
+
+
 					if (leftFlank.length()>30){
 						leftFlank = leftFlank.substring(leftFlank.length()-30, leftFlank.length());
 					}
-					
+
 					if (rightFlank.length()>30){
 						rightFlank = rightFlank.substring(0,30);
 					}
-					
+
 					/*System.out.println("LEFT FLANK = "+leftFlank);
 					System.out.println("RIGHT FLANK = "+rightFlank);
 					System.out.println("REPEAT = "+repeatSection);
-					*/
+					 */
 					TIntIntMap readFlankKmers = new TIntIntHashMap(); // map that will store all kmers coming from short flanks
 					TIntIntMap readPairKmers = new TIntIntHashMap(); // map that will store all kmers from the paired End read
 
@@ -202,7 +203,7 @@ public class processingThread implements Runnable{
 						String twelveMer = rightFlank.substring(p,p+12);
 						if (!twelveMer.contains("N")){	
 							int kmerIndex = kmerIndexMap.getIntForString(twelveMer);
-							
+
 							kmerUnitPairLocations = shortKmerMap.get(new KmerRepeatUnitPair(kmerIndex, repeatIndex1));
 							if (kmerUnitPairLocations != null){							
 								if (!readFlankKmers.containsKey(kmerIndex)){
@@ -221,20 +222,66 @@ public class processingThread implements Runnable{
 					double maxScore = -1.0;
 					double maxNumOfFlankKmers = readFlankKmers.keySet().size();								
 					double maxNumOfPairKmers = readPairKmers.keySet().size();	
-					
-				
+
+
 					int numOfLocations = genomicLocations1.size();
 					int[] scoresOfLocations=new int[numOfLocations];
 
-					if (maxNumOfFlankKmers>10){// we can rely solely on the short flank kmers - because there are enough of these
-						
+					if (maxNumOfFlankKmers>20){// we can relay solely on the short flank kmers - because there are enough of these
+						int ind = 0;
+						for (GenomicLocation gl : genomicLocations1){
+							int localKmerCount = gl.getCounter(threadID);
+							if (maxScore<localKmerCount){
+								maxScore = localKmerCount;
+							}			
+							scoresOfLocations[ind]=localKmerCount;
+							ind++;
+						}	
+
+
+						ArrayList<GenomicLocation> potentialMappings = new ArrayList<GenomicLocation>();
+						for (GenomicLocation gl : genomicLocations1){
+							int localKmerCount = gl.getCounter(threadID);
+							if (localKmerCount>=maxScore-2){
+								potentialMappings.add(gl);
+							}
+						}
+
+						// TODO rewrite the function that chooses the most fitting mappings from the potential
+						// mappings and prints into a file - we will merge later on
+						detectAndReportAlignment(potentialMappings, id, line1, mateRead,leftFlank, rightFlank, repeatSection);
+
 					}
 					else{ // we will have to use the paired end, because the flanks are too short 
+						// rewrite the solution for usage of paired end.
+						// ideally we should go for sparse count of kmers - let say every 5bp or something like - that 
+						// ensuring fast count and selection of potential Mappings
+						// we should not forget the kmers counts coming from the flanks - they are not many - but still there
+						// we shouldn't attemp aligning without taking into consideration the short flanks sequence kmers
 						
+						for (int p=0;p<mateRead.length()-11;p=p+5){
+							String twelveMer = mateRead.substring(p,p+12);
+							if (!twelveMer.contains("N")){
+								int kmerIndex = kmerIndexMap.getIntForString(twelveMer);
+								kmerUnitPairLocations = longKmerMap.get(new KmerRepeatUnitPair(kmerIndex, repeatIndex1));
+								if (kmerUnitPairLocations!=null){
+									if (!readPairKmers.containsKey(kmerIndex)){
+										for (GenomicLocation gl : kmerUnitPairLocations){
+											gl.addOneToCounter(threadID);												
+										}
+										readPairKmers.put(kmerIndex, 1);
+									}
+								}
+							}
+						}
+						maxNumOfPairKmers = readPairKmers.keySet().size();
+						// TODO - continue from here
+						// we are supposed to run over different potential locations vasing on the kmers coming from the mate READ and
+						// update the counters and then select maximums - and invoke same method of alignment as in short flank case
 					}
-					
+
 					//--------------------------------------------------------// WORKING HERE
-					
+
 					// COUNTER NULLIFICATION
 					int[] kmerKeys = readFlankKmers.keys();
 					// NULLIFICATION OF THE SHORT FLANK KMERS GENOMIC LOCATIONS
@@ -247,7 +294,7 @@ public class processingThread implements Runnable{
 							}
 						}
 					}
-					
+
 					kmerKeys = readPairKmers.keys();
 					// NULLIFICATION OF THE PAIRED END READ KMER GENOMIC LOCATIONS
 					for (int in = 0;in<kmerKeys.length;in++){									
@@ -265,5 +312,11 @@ public class processingThread implements Runnable{
 			}
 
 		}
+	}
+
+	private void detectAndReportAlignment(ArrayList<GenomicLocation> potentialLocations, String readID, String read, String pairRead,String leftFlank, String rightFlank, String repetitiveSection) throws IOException{
+
+		//TODO rewrite the method
+
 	}
 }

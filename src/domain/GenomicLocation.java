@@ -26,4 +26,12 @@ public class GenomicLocation {
 	public void nullifyCounter(int index){
 		multyThreadCounters[index] = 0;		
 	}
+	public int getCounter(int index){
+		if (index>=multyThreadCounters.length || index<0){
+			System.out.println("Access to negative counter of some thread in GenomicLocation");
+			return -1;
+		}
+		return multyThreadCounters[index];
+	
+	}
 }

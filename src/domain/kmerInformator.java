@@ -52,6 +52,11 @@ public class kmerInformator {
 	
 	// Number of threads - is the number of entries in the array of counters on the hash map data structure
 	public kmerInformator(int kLength, String chromosomeListFileName, String trfBedFileName, int numOfThreads) throws IOException{
+		
+		System.out.println("MAKE SURE THE NUMBER OF THREADS  IS NOT INTERFERING WITH THE THREADS IDS - potentially there could be too many jobs for the number of available CPUs");
+		// TODO check the number of threads - is correct, it is dictating th maximal parallelization - due to the arrays in the GenomicLocations
+		// Avoid situation where number of concurrent threads is higher then the length of these arrays.
+		
 		numberOfThreads = numOfThreads;
 		System.out.println("Beginning generation of the k-mer map (String->int)");
 		kmerMap = new KmerMap(kLength);
