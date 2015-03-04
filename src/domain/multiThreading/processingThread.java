@@ -180,6 +180,10 @@ public class processingThread implements Runnable{
 
 					HashSet<GenomicLocation> kmerUnitPairLocations;
 
+					// Going across left flank and extracting kmers from it, creating pairs with the repeatUnit and retreiving the genomic locations
+					// matching these pairs, adding 1 to each genomic location counter
+					// and record the kmers that were used for this read
+					
 					for (int p=0;p<leftFlank.length()-11;p=p+1){
 						String twelveMer = leftFlank.substring(p,p+12);
 						if (!twelveMer.contains("N")){
@@ -199,6 +203,8 @@ public class processingThread implements Runnable{
 						}
 					}
 
+					// same story with right flank
+					
 					for (int p=0;p<rightFlank.length()-11;p=p+1){
 						String twelveMer = rightFlank.substring(p,p+12);
 						if (!twelveMer.contains("N")){	
@@ -217,8 +223,10 @@ public class processingThread implements Runnable{
 					}
 
 
-					//--------------------------------------------------------// WORKING HERE!!!					
-					// MAXIMUM FINDING				
+										
+					// MAXIMUM FINDING	
+					// Now that we have readFlankMers set, we would like to find potential locations for alignment
+					
 					double maxScore = -1.0;
 					double maxNumOfFlankKmers = readFlankKmers.keySet().size();								
 					double maxNumOfPairKmers = readPairKmers.keySet().size();	
@@ -237,8 +245,9 @@ public class processingThread implements Runnable{
 							scoresOfLocations[ind]=localKmerCount;
 							ind++;
 						}	
-
-
+						
+						// finding the maximum score in the genomic locations
+						// adding "close" to the maximum value scores to the list of potential locations
 						ArrayList<GenomicLocation> potentialMappings = new ArrayList<GenomicLocation>();
 						for (GenomicLocation gl : genomicLocations1){
 							int localKmerCount = gl.getCounter(threadID);
@@ -247,8 +256,7 @@ public class processingThread implements Runnable{
 							}
 						}
 
-						// TODO rewrite the function that chooses the most fitting mappings from the potential
-						// mappings and prints into a file - we will merge later on
+						
 						detectAndReportAlignment(potentialMappings, id, line1, mateRead,leftFlank, rightFlank, repeatSection);
 
 					}
@@ -258,6 +266,7 @@ public class processingThread implements Runnable{
 						// ensuring fast count and selection of potential Mappings
 						// we should not forget the kmers counts coming from the flanks - they are not many - but still there
 						// we shouldn't attemp aligning without taking into consideration the short flanks sequence kmers
+						
 						
 						for (int p=0;p<mateRead.length()-11;p=p+5){
 							String twelveMer = mateRead.substring(p,p+12);
@@ -275,12 +284,34 @@ public class processingThread implements Runnable{
 							}
 						}
 						maxNumOfPairKmers = readPairKmers.keySet().size();
-						// TODO - continue from here
-						// we are supposed to run over different potential locations vasing on the kmers coming from the mate READ and
-						// update the counters and then select maximums - and invoke same method of alignment as in short flank case
+							
+						maxScore = -1.0;
+						if (maxNumOfFlankKmers+maxNumOfPairKmers>20){// we can relay on mixture of flank Kmers and paired end kmers
+							int ind = 0;
+							for (GenomicLocation gl : genomicLocations1){
+								int localKmerCount = gl.getCounter(threadID);
+								if (maxScore<localKmerCount){
+									maxScore = localKmerCount;
+								}			
+								scoresOfLocations[ind]=localKmerCount;
+								ind++;
+							}	
+							
+							// finding the maximum score in the genomic locations
+							// adding "close" to the maximum value scores to the list of potential locations
+							ArrayList<GenomicLocation> potentialMappings = new ArrayList<GenomicLocation>();
+							for (GenomicLocation gl : genomicLocations1){
+								int localKmerCount = gl.getCounter(threadID);
+								if (localKmerCount>=maxScore-2){
+									potentialMappings.add(gl);
+								}
+							}
+
+							
+							detectAndReportAlignment(potentialMappings, id, line1, mateRead,leftFlank, rightFlank, repeatSection);
+						}
 					}
 
-					//--------------------------------------------------------// WORKING HERE
 
 					// COUNTER NULLIFICATION
 					int[] kmerKeys = readFlankKmers.keys();
@@ -307,7 +338,7 @@ public class processingThread implements Runnable{
 						}
 					}
 
-				}
+				} // genomic location was NULL end of the 
 
 			}
 
@@ -315,8 +346,13 @@ public class processingThread implements Runnable{
 	}
 
 	private void detectAndReportAlignment(ArrayList<GenomicLocation> potentialLocations, String readID, String read, String pairRead,String leftFlank, String rightFlank, String repetitiveSection) throws IOException{
-
+		// TODO March 3, 2015 We have to rewrite the reporter and aligner function - detectAndReportAlignment
+		// >> detectAndReportAlignment
+		// TODO rewrite the function that chooses the most fitting mappings from the potential
+		// mappings and prints into a file - we will merge later on
 		//TODO rewrite the method
+		
+		
 
 	}
 }
