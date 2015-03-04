@@ -345,6 +345,19 @@ public class processingThread implements Runnable{
 		}
 	}
 
+	
+	/**
+	 * The method will take a read pair and ArrayList of genomic locations it will attept to align the reads to
+	 * in case promising alignment found it will print the genomic location and the alignment to the file created by the running thread.
+	 * These files will be later merged.
+	 * 
+	 * For the alignment the following data is needed:
+	 * 	data[i]=align(readsLeftFlank, readsRightFlank, readsRepetitiveReadSeq, genomicLocation.getLeftFlank(), 
+	 * genomicLocation.getRightFlank(), genomicLocation.getRepetitiveSequence(), readsPairedEnd, matrix, gapP,readID);
+	 * We can elevate the gap penalty on the extension - to prevent gapped alignment
+	 * Other than that I am not sure
+	 * @throws IOException 
+	 */
 	private void detectAndReportAlignment(ArrayList<GenomicLocation> potentialLocations, String readID, String read, String pairRead,String leftFlank, String rightFlank, String repetitiveSection) throws IOException{
 		// TODO March 3, 2015 We have to rewrite the reporter and aligner function - detectAndReportAlignment
 		// >> detectAndReportAlignment
