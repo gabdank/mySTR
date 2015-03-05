@@ -13,8 +13,8 @@ public class ThreadTest {
 
 	@Test
 	public void test() throws IOException {
-		kmerInformator testInformator = new kmerInformator(12, "/home/gabdank/Documents/STR_Attempt/chromosomes.list", "/home/gabdank/Documents/STR_Attempt/temp.indexed.bed", 5);
-		processingThread t = new processingThread(5,"/home/gabdank/workspace/mySTR/fastq/R1.fastq","/home/gabdank/workspace/mySTR/fastq/R2.fastq", testInformator) ;
+		kmerInformator testInformator = new kmerInformator(12, "/home/gabdank/Documents/STR_Attempt/Simulation/chromosomes.list", "/home/gabdank/Documents/STR_Attempt/Simulation/sample.indexed.bed", 13);
+		processingThread t = new processingThread(5,"/home/gabdank/Documents/STR_Attempt/Simulation/paired_dat1.fastq","/home/gabdank/Documents/STR_Attempt/Simulation/paired_dat2.fastq", testInformator,"/home/gabdank/Documents/STR_Attempt/Simulation/out_") ;
 		t.run();
 	}
 }

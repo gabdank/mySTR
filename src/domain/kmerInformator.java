@@ -133,7 +133,10 @@ public class kmerInformator {
 				String fullSeq = t.nextToken();				
 				int repeatStart = Integer.parseInt(t.nextToken());
 
-				GenomicLocation gl = new GenomicLocation(chromosomeIndex,position,numberOfThreads);
+				//GenomicLocation gl = new GenomicLocation(chromosomeIndex,position,numberOfThreads);
+				// previously it was:
+				 GenomicLocation gl = new GenomicLocation(chromosomeIndex,position,fullSeq, representativeUnit.length(), repeatStart, repeatLength, numberOfThreads);				
+				
 				//chromosomeIndex,position,fullSeq, representativeUnit.length(), repeatStart, repeatLength, numberOfThreads);				
 				
 				//System.out.println("Generated genomic location:");
