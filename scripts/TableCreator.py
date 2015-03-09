@@ -22,8 +22,12 @@ def initiateReferenceDictionary(intDict, listOfFileNames, flankLengthThreshold):
             if l[0:14]=="repetitiveUnit":
                 if len(currentRecord)>0:
                     answer = processRecord(currentRecord[0:-1], flankLengthThreshold)
-
+                    
                     key = (answer[0],answer[1])
+                    print key
+                    #print currentRecord
+                    # print answer
+                    #break
                     diction = {}
                     refData = answer[2]
                     diction["reference"] = refData
@@ -41,6 +45,8 @@ def initiateReferenceDictionary(intDict, listOfFileNames, flankLengthThreshold):
         diction["reference"] = refData
         intDict[key]=diction
         alignmentsFile.close()
+        print intDict
+        
 
 def processRecord(record, flanksLengthThreshold):
     ar = record.split("${")
@@ -222,6 +228,10 @@ filesList = ["/media/gabdank/Disk3/MiliionMutation/N2/AlignmentData.results", "/
 
 initiateReferenceDictionary(genomicLocationsDictionary, filesList, 20)
 
+for x in genomicLocationsDictionary:
+    print x
+    print genomicLocationsDictionary[x]
+    break
 
 # initiation of special dictionaries - that will store the "interesting locations data"
 # when they would be constructed the genomicLocationsReferenceDictionary will be updated as well.
@@ -229,6 +239,7 @@ initiateReferenceDictionary(genomicLocationsDictionary, filesList, 20)
 # processing. The special dictionaries could be used for the "alignments" - the numbers, stored in
 # genomicLocationsReferenceDictionary could be used for preparation of the TABLE of the results.
 
+'''
 strainDictions = {}
 strainDictions['N2']={}
 strainDictions['MY1']={}
@@ -458,3 +469,4 @@ for ele in reversed(x):
     #print ele
     print printBeauty(ele)
     #print ele[10]
+'''

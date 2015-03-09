@@ -98,6 +98,107 @@ def readInMergedFile(fileName):
     mergedFile.close()
     return (dict,locationsList)
 
+def printAlignmentData(data, unitLength, threshold, referenceLength, referenceRepeat):
+    #print "PRINTING ALIGNMENT"
+
+    #getRepeatInfo(data, unitLength, threshold, referenceLength, referenceRepeat)
+
+    #print "END OF THE REPAIR"
+
+
+    array = data.split("$")
+    if len(array)>2:
+        left = array[0].split(":")[1]
+        right = array[1].split(":")[1]
+        repeat = array[2].split(":")[1]
+        repeatUnit = array[2].split(":")[1][0:unitLength]
+        readNumOfRepeats = len(repeat)/unitLength
+        referenceNumberOfRepeats = referenceLength/unitLength
+
+        absoluteDifference = abs(referenceNumberOfRepeats-readNumOfRepeats)
+
+        if repeatUnit==referenceRepeat:
+            lF = leftFlankTreatment(left, threshold)
+            rF = rightFlankTreatment(right, threshold)
+
+            if (len(left)<10 or len(right)<10) and readNumOfRepeats>referenceNumberOfRepeats+2 :
+                print lF + "\t{"+repeatUnit+"}"+str(readNumOfRepeats)+"\t"+rF
+            else:
+                if len(left)>=10 and len(right)>=10 and absoluteDifference>1:
+
+                    print lF + "\t{"+repeatUnit+"}"+str(readNumOfRepeats)+"\t"+rF
+        else:
+            tempRepeat = repeatUnit
+            tzuza = 0
+            flag = False
+            repeatProblem = False
+
+            while flag!=True:
+                tzuza += 1
+                tempRepeat = tempRepeat[1:]+tempRepeat[:1]
+                if tempRepeat==referenceRepeat:
+                    flag=True
+                if tzuza==len(tempRepeat):
+                    flag = True
+                    repeatProblem = True
+            if repeatProblem == False:
+                ostatok = len(repeatUnit)-tzuza
+                possibleRepeat = left[-ostatok:]+repeat[:tzuza]
+                updatedLeftFlank = ""
+                combinedRepeat = "zopa"
+
+                if possibleRepeat == referenceRepeat:
+                    combinedRepeat = possibleRepeat+repeat[tzuza:]
+                    updatedLeftFlank = left[:-ostatok]
+
+                else:
+                    combinedRepeat = repeat[tzuza:]
+                    updatedLeftFlank = left+repeat[:tzuza]
+
+                readNumOfRepeats = len(combinedRepeat)/len(repeatUnit)
+
+                lF = leftFlankTreatment(updatedLeftFlank, threshold)
+                rF = rightFlankTreatment(right, threshold)
+                absoluteDifference = abs(referenceNumberOfRepeats-readNumOfRepeats)
+                if (len(left)<10 or len(right)<10) and readNumOfRepeats>referenceNumberOfRepeats+2:
+                    print lF + "\t{"+referenceRepeat+"}"+str(readNumOfRepeats)+"\t"+rF
+                else:
+                    if len(left)>=10 and len(right)>=10 and absoluteDifference>1:
+                        print lF + "\t{"+referenceRepeat+"}"+str(readNumOfRepeats)+"\t"+rF
+
+
+
+def leftFlankTreatment(seq, threshold):
+    if len(seq)>=threshold:
+        return seq[-threshold:]
+    else:
+        delta = threshold-len(seq)
+        toReturn = ""
+        for i in range(delta):
+            toReturn += "-"
+        return toReturn+seq
+
+def rightFlankTreatment(seq,threshold):
+    if len(seq)>=threshold:
+        return seq[0:threshold]
+    else:
+        delta = threshold-len(seq)
+        toReturn = seq
+        for i in range(delta):
+            toReturn += "-"
+        return toReturn
+
+
+
+
+
+
+
+
+
+
+
+
 (diction, locations) =  readInMergedFile("/home/gabdank/Documents/STR_Attempt/Simulation2/merged.output")
 print "chromosome:position\treference\texactRange\texactLeader\tlowerRange\texactValues\tlowerValues"
 
