@@ -154,7 +154,7 @@ public class processingThread implements Runnable{
 			int[] allMaxScoresDistribution, int[] allUsedScoresDistribution, RepetitionList repetition1)
 					throws IOException {
 
-		System.out.println("processing read1:"+line1);
+		//System.out.println("processing read1:"+line1);
 		repetition1.emptyRepetitionList();
 		find_repetition.findMaximalRepetition(line1,repetition1);
 		
@@ -428,9 +428,10 @@ public class processingThread implements Runnable{
 			}
 		}
 		//System.out.println("------------------");		
-		//System.out.println("Number of maximums:"+maximumsCounter);
-		//System.out.println("Maximal score = "+maximalScore);
-		//System.out.println("------------------");
+		
+		System.out.println("Number of maximums:"+maximumsCounter);
+		System.out.println("Maximal score = "+maximalScore);
+		System.out.println("------------------");
 		
 		if (maximumsCounter==1 && maximalScore>=0.85){			
 			bw.write(potentialLocations.get(maximalIndex).reportTheGenomicLocation()+"{[");
@@ -489,10 +490,10 @@ public class processingThread implements Runnable{
 		SequencePair<DNASequence, NucleotideCompound> pairedLeft =Alignments.getPairwiseAlignment(pairedRead, genomicLeftFull,PairwiseSequenceAlignerType.LOCAL, gap,mat);
 		SequencePair<DNASequence, NucleotideCompound> pairedRight =Alignments.getPairwiseAlignment(reversePairedRead, genomicRightFull,PairwiseSequenceAlignerType.LOCAL, gap,mat);
 
-		System.out.println("Left pair \n"+pairedLeft);
-		System.out.println((double)pairedLeft.getNumIdenticals()/pairedEnd.length());
-		System.out.println("Right pair \n"+pairedRight);
-		System.out.println((double)pairedRight.getNumIdenticals()/pairedEnd.length());
+		//System.out.println("Left pair \n"+pairedLeft);
+		//System.out.println((double)pairedLeft.getNumIdenticals()/pairedEnd.length());
+		//System.out.println("Right pair \n"+pairedRight);
+		//System.out.println((double)pairedRight.getNumIdenticals()/pairedEnd.length());
 		/*
 		 * assuming that everything worked fine we can now evaluate our alignments
 		 * so there are two main cases - forward flank and reverse paired end or reversed flanks and forward paired end
@@ -514,7 +515,7 @@ public class processingThread implements Runnable{
 		}
 		else{
 			if (rLeftFlankLen>=flankSizeLimit && rRightFlankLen<flankSizeLimit){
-				System.out.println("left is ok, right is small");
+				//System.out.println("left is ok, right is small");
 				
 				totalForwardFlanksLength = leftSideForward.getLength();
 				totalForwardFlanksIdenticals = leftSideForward.getNumIdenticals();
@@ -522,17 +523,17 @@ public class processingThread implements Runnable{
 				totalReverseFlanksLength = rightSideReverse.getLength();
 				totalReverseFlanksIdenticals = rightSideReverse.getNumIdenticals();
 				
-				System.out.println(leftSideForward);
+				/*System.out.println(leftSideForward);
 				System.out.println("totalFwdFlankLength : "+totalForwardFlanksLength);
 				System.out.println("totalFwdFlankIdenticals : "+totalForwardFlanksIdenticals);
 				
 				System.out.println(rightSideReverse);
 				System.out.println("totalRevFlankLength : "+totalReverseFlanksLength);
-				System.out.println("totalRevFlankIdenticals : "+totalReverseFlanksIdenticals);
+				System.out.println("totalRevFlankIdenticals : "+totalReverseFlanksIdenticals);*/
 			}
 			else{
 				if (rLeftFlankLen<flankSizeLimit && rRightFlankLen>=flankSizeLimit){
-					System.out.println("left is small, right is ok");
+					//System.out.println("left is small, right is ok");
 					
 					totalForwardFlanksLength = rightSideForward.getLength();
 					totalForwardFlanksIdenticals = rightSideForward.getNumIdenticals();
@@ -540,13 +541,13 @@ public class processingThread implements Runnable{
 					totalReverseFlanksLength = leftSideReverse.getLength();
 					totalReverseFlanksIdenticals = leftSideReverse.getNumIdenticals();
 					
-					System.out.println(rightSideForward);
+					/*System.out.println(rightSideForward);
 					System.out.println("totalFwdFlankLength : "+totalForwardFlanksLength);
 					System.out.println("totalFwdFlankIdenticals : "+totalForwardFlanksIdenticals);
 					
 					System.out.println(leftSideReverse);
 					System.out.println("totalRevFlankLength : "+totalReverseFlanksLength);
-					System.out.println("totalRevFlankIdenticals : "+totalReverseFlanksIdenticals);
+					System.out.println("totalRevFlankIdenticals : "+totalReverseFlanksIdenticals);*/
 					
 				}
 				else{
@@ -581,11 +582,11 @@ public class processingThread implements Runnable{
 		//System.out.println("FINISHED TO ALIGN:");
 
 		if (forwardScoreMin>reverseScoreMin){
-			System.out.println("Forward wins");
+			//System.out.println("Forward wins, the minimal score was "+forwardScoreMin);
 			return new AlignmentsData(forwardScoreMin, id, readLeftFlank, readRightFlank, readRepetitiveRegion, leftSideForward, rightSideForward, pairedRight);
 		}
 		else{
-			System.out.println("Reverse wins");
+			//System.out.println("Reverse wins, the minimal score was "+reverseScoreMin);
 			return new AlignmentsData(reverseScoreMin, id, reverseReadRightSeq, reverseReadLeftSeq, reverseReadRepetitiveSeq, leftSideReverse, rightSideReverse, pairedLeft);
 		}
 	}	
