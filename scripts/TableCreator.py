@@ -137,6 +137,7 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
             if len(currentRecord)>0:
                 locationsDictionary[getKey(currentRecord[0:-1])][strainName]=getNumbers(currentRecord[0:-1])
                 refNumOfReps = locationsDictionary[getKey(currentRecord[0:-1])]['reference'][2]
+                
                 listExacts = locationsDictionary[getKey(currentRecord[0:-1])][strainName][0]
                 listLowers = locationsDictionary[getKey(currentRecord[0:-1])][strainName][1]
 
