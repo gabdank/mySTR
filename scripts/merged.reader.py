@@ -222,6 +222,8 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
 
     fil.close()
 
+
+
 def localAlignment(gLeft,gRepetitive,gRight, lLeft,lRepetitive, lRight):
     if len(lLeft)>20:
         print "long"
