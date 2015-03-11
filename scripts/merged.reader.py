@@ -128,6 +128,9 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
             print "local repetitive : "+localRepetitive
             print localLeft+"\t"+localRepetitive[0:8]+"..."+localRepetitive[-8:]+"\t"+localRight
             localUnit = localRepetitive[0:len(genomicUnit)]
+            
+            print localAlignment(genomicLeft,genomicRepetitive,genomicRight, localLeft,localRepetitive, localRight)            
+            break
             #print localUnit
             #print localRepetitive            
             #print localRight
@@ -135,7 +138,7 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
             #print "=============================================="
             
             # printOutAlignment(genomicLeft, localLeft, genomicUnit, )            
-            
+            '''
             if localUnit==genomicUnit:
                 #print "units identical"
                 
@@ -188,7 +191,7 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
            
            
 
-
+            '''    
             
             #break
         if l[0]=="}": #time to put all the data in the aligned sequences into dictioanry entry
@@ -219,7 +222,42 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
 
     fil.close()
 
-
+def localAlignment(gLeft,gRepetitive,gRight, lLeft,lRepetitive, lRight):
+    if len(lLeft)>20:
+        print "long"
+        lLeft = lLeft[-20:]
+        
+    if len(lLeft)<20:
+        print "short"
+       
+    scores = {}
+    leftShortening = 0    
+    while leftShortening<10:       
+        x = -1
+        mone = 0
+        while x>=-len(lLeft):
+            if lLeft[x]==gLeft[x]:
+                mone += 1
+            x -= 1
+        
+        print gLeft
+        print lLeft
+        print mone
+        scores[leftShortening]=mone
+        print "lLeft:"+str(lLeft) 
+        lLeft = lLeft[:-1]
+        print "lLeft:"+str(lLeft)
+        leftShortening += 1
+    
+    maxIndex = 0
+    maxScore = scores[0]
+    for a in scores:
+        if scores[a]>maxScore:
+            maxScore = scores[a]
+            maxIndex = a
+    print maxScore
+    return "zopa"
+    
 def rotateCheck(one, two):
     #print "Word :"+one
     dictOne = {}
