@@ -15,6 +15,7 @@ names. For each location we can retreive information of the refrence genome or a
 the function will only build the refrence currently.
 '''
 
+import numpy as np
 
 def initRefDict(diction, fileNamesList, flankLengthThreshold):    
     for name in fileNamesList:
@@ -68,7 +69,7 @@ def processReferenceData(data, threshold, delta):
     return (array[2].split(":")[1][-threshold:], actualRepeat, numOfReps ,unfinishedBusiness, array[3].split(":")[1][0:threshold])
 
    
-def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDiction):
+def processNumbers(strainFile, locationsDictionary, strainName):
     m = 0
     currentRecordKey = ""
     fil = open(strainFile, "r")
@@ -94,10 +95,10 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
             currentRecordKey = (array[-3].split(":")[1],array[-2].split(":")[1])
 
             
-            print ""
-            print currentRecordKey
-            print locationsDictionary[currentRecordKey]
-            print ""
+            #print ""
+            #print currentRecordKey
+            #print locationsDictionary[currentRecordKey]
+            #print ""
             genomicLeft = locationsDictionary[currentRecordKey]['reference'][0]
             genomicRight = locationsDictionary[currentRecordKey]['reference'][4]
             genomicUnit = locationsDictionary[currentRecordKey]['reference'][1]
@@ -113,12 +114,12 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
                 
                 
             #print "genomic repetative = "+genomicRepetitive
-            print "genomic construction:"
-            print genomicLeft + "\t" +genomicRepetitive[0:8]+"..."+genomicRepetitive[-8:]+"\t"+str(len(genomicRepetitive))+"\t"+genomicRight
-            print "------------------------------------------------------------------------------------------"
-        #print locationsDictionary[currentRecordKey]
-        #if l[0]=='{': #starting section of aligned reads
-        #if l[0]=='}': #finished to read section of aligned reads
+            #print "genomic construction:"
+            #print genomicLeft + "\t" +genomicRepetitive[0:8]+"..."+genomicRepetitive[-8:]+"\t"+str(len(genomicRepetitive))+"\t"+genomicRight
+            #print "------------------------------------------------------------------------------------------"
+            # initiate two lists - for exact and for lower values:
+            exactList = []
+            lowerList = []            
         if l[0]=="[":
             #print l[1:-2].split('$')
             localArr = l[1:-2].split('$')
@@ -135,26 +136,40 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
             rightIndex = rightAlignment(genomicRight, localRight)
             #print rightIndex
             if leftIndex ==0:
+                if len(localLeft)<=20:
+                    storedLeft = localLeft
+                else:
+                    storedLeft = localLeft[-20:]
                 combinedLocalLeft = leftFlankTreatment(localLeft,20)
                 combinedLocalRepetitive = localRepetitive+localRight[:rightIndex] 
-            else:                
-                combinedLocalLeft = leftFlankTreatment(localLeft[:-leftIndex],20) 
+            else:          
+                shortenedLeft = localLeft[:-leftIndex]
+                if len(shortenedLeft)<=20:
+                    storedLeft = shortenedLeft
+                else:
+                    storedLeft = shortenedLeft[-20:]
+                combinedLocalLeft = leftFlankTreatment(shortenedLeft,20) 
                 combinedLocalRepetitive = localLeft[-leftIndex:]+localRepetitive+localRight[:rightIndex] 
-                
+            shortenedRight = localRight[rightIndex:]
+            if len(shortenedRight)<=20:
+                storedRight = shortenedRight
+            else:
+                storedRight = shortenedRight[:20]
+            recordToStore = (storedLeft, combinedLocalRepetitive, storedRight)
+            
             combinedLocalRight = rightFlankTreatment(localRight[rightIndex:],20)       
-            
-            
             combinedRepeatLength = len(combinedLocalRepetitive)
-            print combinedLocalLeft+"\t"+combinedLocalRepetitive[:8]+"..."+combinedLocalRepetitive[-8:]+"\t"+str(len(combinedLocalRepetitive))+"\t"+combinedLocalRight
+            #print combinedLocalLeft+"\t"+combinedLocalRepetitive[:8]+"..."+combinedLocalRepetitive[-8:]+"\t"+str(len(combinedLocalRepetitive))+"\t"+combinedLocalRight
+            if len(storedLeft)<8 or len(storedRight)<8: #lower case
+                lowerList.append(recordToStore)                
+            else:
+                exactList.append(recordToStore)
             #print localAlignment(genomicLeft,genomicRepetitive,genomicRight, localLeft,localRepetitive, localRight)            
             #print leftIndex
             #print genomicLeft
             #print leftFlankTreatment(localLeft[:-leftIndex],20)            
-            
-                                 
             #print genomicRepetitive
             #print combinedLocalRepetitive
-            
             #print rightIndex
             #print genomicRight
             #print rightFlankTreatment(localRight[rightIndex:],20)
@@ -165,72 +180,25 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
             #print localLeft
             #print "=============================================="
             
-            # printOutAlignment(genomicLeft, localLeft, genomicUnit, )            
-            '''
-            if localUnit==genomicUnit:
-                #print "units identical"
-                
-                lF = leftFlankTreatment(localLeft, 20)
-                rF = rightFlankTreatment(localRight, 20)
-                localRepeatsNumber = len(localRepetitive)/len(localUnit)    
-                localRecord = (lF,localUnit,localRepeatsNumber,rF)      
-                
-                print str(localRecord) + " identical"
-
-                 
-            else:
-                #print "differet units, will have to move"
-                tempRepeat = localUnit            
-                tzuza = 0
-                flag = False
-                
-                
-                repeatOK = rotateCheck(localUnit, genomicUnit)                
-                
-                while flag!=True:
-                    tzuza += 1
-                    tempRepeat = tempRepeat[1:]+tempRepeat[:1]
-                    if tempRepeat == genomicUnit:
-                        flag=True
-                    if tzuza==len(tempRepeat):
-                        flag = True
-                        repeatOK = False
-                if repeatOK == True:
-                    ostatok = len(localUnit)-tzuza
-                    possibleRepeat = localLeft[-ostatok:]+localRepetitive[:tzuza]
-                    updatedLeftFlank = ""
-                    combinedRepeat = "zopa"
-                    
-                    if possibleRepeat == genomicUnit:
-                        combinedRepeat = possibleRepeat+localRepetitive[tzuza:]
-                        updatedLeftFlank = localLeft[:-ostatok]
-                    else:
-                        combinedRepeat = localRepetitive[tzuza:]
-                        updatedLeftFlank = localLeft+localRepetitive[:tzuza]
-                    
-                    readNumOfRepeats = len(combinedRepeat)/len(localUnit)
-                    lF = leftFlankTreatment(updatedLeftFlank, 20)
-                    rF = rightFlankTreatment(localRight, 20)
-                    #localRepeatsNumber = len(localRepetitive)/len(localUnit)    
-
-                    localRecord = (lF, possibleRepeat, readNumOfRepeats, rF)      
-                    #print updatedLeftFlank + "\t" +possibleRepeat+"\t"+localRight
-                    print str(localRecord)+" different, so rotated"
-           
-           
-
-            '''    
             
-            #break
         if l[0]=="}": #time to put all the data in the aligned sequences into dictioanry entry
-            locationsDictionary[currentRecordKey][strainName]=['zopa']
-
-            print currentRecordKey
-            #print locationsDictionary[currentRecordKey]
+            locationsDictionary[currentRecordKey][strainName]=(exactList,lowerList)
+            
+            '''exactLengthsList = extractLengthsFromValuesList(exactList)
+            lowerLengthsList = extractLengthsFromValuesList(lowerList)
+            exactArray = np.array(exactLengthsList)            
+            lowerArray = np.array(lowerLengthsList)            
+            
+            print exactArray
+            print np.average(exactArray)
+            print np.std(exactArray)
+            print lowerArray
+            print np.average(lowerArray)
+            print np.std(lowerArray)
+            '''
         #if l[0]=='{': #starting section of aligned reads
         #if l[0]=='}': #finished to read section of aligned reads
-        '''
-        if l[0]=="[":
+        '''if l[0]=="[":
             print l[1:-2].split('$')
             
         m+=1
@@ -263,6 +231,15 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
     #    strainSpecificDiction[getKey(currentRecord)]=currentRecord
 
     fil.close()
+
+
+def extractLengthsFromValuesList(anyList):
+    vals = []
+    for (a,b,c) in anyList:
+        vals.append(len(b))
+    #print vals
+    return vals
+    
 
 def leftAlignment(gLeft, lLeft):
     if len(lLeft)>20:
@@ -409,28 +386,57 @@ def rightFlankTreatment(seq,threshold):
 dataDictionary = {}
 listOfMergedFiles = ['merged.output']
 
-    
-dataDictionary = {}
-listOfMergedFiles = ['merged.output','merged.output']
-
+ 
 initRefDict(dataDictionary,listOfMergedFiles,20)
 
 # at this stage we have finished to extract all the reference information and now we should extract strain specific information
-
 #for entry in dataDictionary:
 #    print entry
 #    print dataDictionary[entry]
 
-for entry in dataDictionary:
-    print entry
-    print dataDictionary[entry]
-
-strainDictionary = {}
-strainDictionary["sampleStrain"]={}
 strainFileName = "merged.output"
-processNumbers(strainFileName, dataDictionary, "sampleStrain", strainDictionary["sampleStrain"])
+processNumbers(strainFileName, dataDictionary, "sampleStrain")
 
-#print dataDictionary
+for (chromo,location) in dataDictionary:
+    k = (chromo,location)
+    referenceData = dataDictionary[k]['reference']
+    if referenceData[3]=='ZERO':
+        referenceLength = referenceData[2]*len(referenceData[1])
+    else:
+        referenceLength = (referenceData[2]*len(referenceData[1]))+len(referenceData[3])
+
+    strainData = dataDictionary[k]['sampleStrain']
+    exactL = strainData[0]
+    lowerL = strainData[1]
+
+    exactLengthsList = extractLengthsFromValuesList(exactL)
+    lowerLengthsList = extractLengthsFromValuesList(lowerL)    
+    
+    exactArray = np.array(exactLengthsList)            
+    #lowerArray = np.array(lowerLengthsList)            
+    exactAVG = np.average(exactArray)
+    exactSTD = np.std(exactArray)
+    #lowerAVG = np.average(lowerArray)
+    #lowerSTD = np.std(lowerArray)
+    
+    #print referenceData
+    lineToPrint = chromo +":"+location+"\t["+referenceData[1]+"]"+str(referenceLength)+"\t"
+    
+    if len(exactLengthsList)>0:
+        lineToPrint += str(exactAVG)+":"+str(exactSTD)+"\t"
+    else:
+        lineToPrint += "-:-\t"
+        
+    interestingLower = False
+    for x in lowerLengthsList:
+        if x>referenceLength+8:
+            interestingLower=True
+    if interestingLower==True:
+        lineToPrint += "Long-Lower\t"
+    else:
+        lineToPrint += "-\t"
+    print lineToPrint
+    #print dataDictionary[(chromo,location)].keys()
 
     
 '''def initiateReferenceDictionary(intDict, listOfFileNames, flankLengthThreshold):
