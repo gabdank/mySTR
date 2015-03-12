@@ -18,6 +18,7 @@ public class MergerDriver {
 
 
 	public static void main(String[] args) throws IOException {
+		
 		HashMap<KeyPair,ArrayList<String>> alignments = new HashMap<KeyPair,ArrayList<String>>();
 		HashMap<KeyPair,String> genomicLocations = new HashMap<KeyPair,String>();
 
