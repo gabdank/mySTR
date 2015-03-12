@@ -112,9 +112,10 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
                 genomicRepetitive +=genomicSheerit
                 
                 
-            print "genomic repetative = "+genomicRepetitive
+            #print "genomic repetative = "+genomicRepetitive
             print "genomic construction:"
-            print genomicLeft + "\t" +genomicRepetitive[0:8]+"..."+genomicRepetitive[-8:]+"\t"+genomicRight
+            print genomicLeft + "\t" +genomicRepetitive[0:8]+"..."+genomicRepetitive[-8:]+"\t"+str(len(genomicRepetitive))+"\t"+genomicRight
+            print "------------------------------------------------------------------------------------------"
         #print locationsDictionary[currentRecordKey]
         #if l[0]=='{': #starting section of aligned reads
         #if l[0]=='}': #finished to read section of aligned reads
@@ -125,12 +126,39 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
             localRight = localArr[1].split(':')[1]
             localRepetitive = localArr[2].split(':')[1]
             
-            print "local repetitive : "+localRepetitive
-            print localLeft+"\t"+localRepetitive[0:8]+"..."+localRepetitive[-8:]+"\t"+localRight
+            #print "local repetitive : "+localRepetitive
+            #print localLeft+"\t"+localRepetitive[0:8]+"..."+localRepetitive[-8:]+"\t"+str(len(localRepetitive))+"\t"+localRight
             localUnit = localRepetitive[0:len(genomicUnit)]
             
-            print localAlignment(genomicLeft,genomicRepetitive,genomicRight, localLeft,localRepetitive, localRight)            
-            break
+            leftIndex = leftAlignment(genomicLeft, localLeft)
+            #print leftIndex
+            rightIndex = rightAlignment(genomicRight, localRight)
+            #print rightIndex
+            if leftIndex ==0:
+                combinedLocalLeft = leftFlankTreatment(localLeft,20)
+                combinedLocalRepetitive = localRepetitive+localRight[:rightIndex] 
+            else:                
+                combinedLocalLeft = leftFlankTreatment(localLeft[:-leftIndex],20) 
+                combinedLocalRepetitive = localLeft[-leftIndex:]+localRepetitive+localRight[:rightIndex] 
+                
+            combinedLocalRight = rightFlankTreatment(localRight[rightIndex:],20)       
+            
+            
+            combinedRepeatLength = len(combinedLocalRepetitive)
+            print combinedLocalLeft+"\t"+combinedLocalRepetitive[:8]+"..."+combinedLocalRepetitive[-8:]+"\t"+str(len(combinedLocalRepetitive))+"\t"+combinedLocalRight
+            #print localAlignment(genomicLeft,genomicRepetitive,genomicRight, localLeft,localRepetitive, localRight)            
+            #print leftIndex
+            #print genomicLeft
+            #print leftFlankTreatment(localLeft[:-leftIndex],20)            
+            
+                                 
+            #print genomicRepetitive
+            #print combinedLocalRepetitive
+            
+            #print rightIndex
+            #print genomicRight
+            #print rightFlankTreatment(localRight[rightIndex:],20)
+            #break
             #print localUnit
             #print localRepetitive            
             #print localRight
@@ -222,43 +250,57 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
 
     fil.close()
 
-
-
-def localAlignment(gLeft,gRepetitive,gRight, lLeft,lRepetitive, lRight):
+def leftAlignment(gLeft, lLeft):
     if len(lLeft)>20:
-        print "long"
         lLeft = lLeft[-20:]
-        
-    if len(lLeft)<20:
-        print "short"
-       
     scores = {}
-    leftShortening = 0    
-    while leftShortening<10:       
+    leftShortening = 0
+    while leftShortening<10:
         x = -1
         mone = 0
         while x>=-len(lLeft):
             if lLeft[x]==gLeft[x]:
                 mone += 1
             x -= 1
-        
-        print gLeft
-        print lLeft
-        print mone
         scores[leftShortening]=mone
-        print "lLeft:"+str(lLeft) 
         lLeft = lLeft[:-1]
-        print "lLeft:"+str(lLeft)
         leftShortening += 1
-    
+
     maxIndex = 0
     maxScore = scores[0]
     for a in scores:
         if scores[a]>maxScore:
             maxScore = scores[a]
             maxIndex = a
-    print maxScore
-    return "zopa"
+    return maxIndex
+
+def rightAlignment(gRight, lRight):
+    if len(lRight)>20:
+        lRight = lRight[0:20]
+    scores = {}
+    rightShortening = 0
+    while rightShortening<10:
+        x = 0
+        mone = 0
+        while x < len(lRight):
+            ##print lRight
+            #print x
+            if lRight[x]==gRight[x]:
+                mone += 1
+            x += 1
+        scores[rightShortening]=mone
+        lRight = lRight[1:]
+        rightShortening += 1
+    #print scores
+    maxIndex = 0
+    maxScore = scores[0]
+    for a in scores:
+        if scores[a]>maxScore:
+            maxScore = scores[a]
+            maxIndex = a
+    return maxIndex
+
+
     
 def rotateCheck(one, two):
     #print "Word :"+one
@@ -351,7 +393,7 @@ def rightFlankTreatment(seq,threshold):
         return toReturn
         
 dataDictionary = {}
-listOfMergedFiles = ['merged.output','merged.output']
+listOfMergedFiles = ['merged.output']
 
 initRefDict(dataDictionary,listOfMergedFiles,20)
 
