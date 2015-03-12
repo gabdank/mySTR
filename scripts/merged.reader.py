@@ -14,8 +14,11 @@ it stores for every location (chr,position) a dictioanry with key that correspon
 names. For each location we can retreive information of the refrence genome or any given strain, but
 the function will only build the refrence currently.
 '''
+<<<<<<< HEAD
 from Bio import pairwise2
 
+=======
+>>>>>>> a8ff575b31751ca235ffa67aca59c233d85eb7a1
 
 def initRefDict(diction, fileNamesList, flankLengthThreshold):    
     for name in fileNamesList:
@@ -93,6 +96,7 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
             #print array[-3]
             #print array[-2]
             currentRecordKey = (array[-3].split(":")[1],array[-2].split(":")[1])
+<<<<<<< HEAD
             
             print ""
             print currentRecordKey
@@ -224,6 +228,15 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
             #break
         if l[0]=="}": #time to put all the data in the aligned sequences into dictioanry entry
             locationsDictionary[currentRecordKey][strainName]=['zopa']
+=======
+            print currentRecordKey
+            #print locationsDictionary[currentRecordKey]
+        #if l[0]=='{': #starting section of aligned reads
+        #if l[0]=='}': #finished to read section of aligned reads
+        if l[0]=="[":
+            print l[1:-2].split('$')
+            
+>>>>>>> a8ff575b31751ca235ffa67aca59c233d85eb7a1
         '''m+=1
         n = 0
         if l[0:14]=="repetitiveUnit":
@@ -232,8 +245,15 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
                 refNumOfReps = locationsDictionary[getKey(currentRecord[0:-1])]['reference'][2]
                 listExacts = locationsDictionary[getKey(currentRecord[0:-1])][strainName][0]
                 listLowers = locationsDictionary[getKey(currentRecord[0:-1])][strainName][1]
+<<<<<<< HEAD
                 #if isInteresting(listExacts, listLowers, refNumOfReps)== True:
                 #    strainSpecificDiction[getKey(currentRecord[0:-1])]=currentRecord
+=======
+
+                #if isInteresting(listExacts, listLowers, refNumOfReps)== True:
+                #    strainSpecificDiction[getKey(currentRecord[0:-1])]=currentRecord
+
+>>>>>>> a8ff575b31751ca235ffa67aca59c233d85eb7a1
                 currentRecord = l.strip()
             else:
                 currentRecord = l.strip()+"$"
@@ -250,6 +270,7 @@ def processNumbers(strainFile, locationsDictionary, strainName, strainSpecificDi
 
     fil.close()
 
+<<<<<<< HEAD
 def leftAlignment(gLeft, lLeft):
     if len(lLeft)>20:
         lLeft = lLeft[-20:]
@@ -334,6 +355,8 @@ def rotateCheck(one, two):
     return True
     
     
+=======
+>>>>>>> a8ff575b31751ca235ffa67aca59c233d85eb7a1
 def getKey(record):
     ar = record.split("${")
     referenceData = ar[0]
@@ -372,6 +395,7 @@ def printNumbers(refD, aliD, unitLength):
                 exactVals.append(numOfRepeats)
     return (sorted(exactVals),sorted(lowerVals))
 
+<<<<<<< HEAD
 def leftFlankTreatment(seq, threshold):
     if len(seq)>=threshold:
         return seq[-threshold:]
@@ -394,22 +418,37 @@ def rightFlankTreatment(seq,threshold):
         
 dataDictionary = {}
 listOfMergedFiles = ['merged.output']
+=======
+    
+dataDictionary = {}
+listOfMergedFiles = ['merged.output','merged.output']
+>>>>>>> a8ff575b31751ca235ffa67aca59c233d85eb7a1
 
 initRefDict(dataDictionary,listOfMergedFiles,20)
 
 # at this stage we have finished to extract all the reference information and now we should extract strain specific information
 
+<<<<<<< HEAD
 #for entry in dataDictionary:
 #    print entry
 #    print dataDictionary[entry]
 
+=======
+for entry in dataDictionary:
+    print entry
+    print dataDictionary[entry]
+>>>>>>> a8ff575b31751ca235ffa67aca59c233d85eb7a1
 
 strainDictionary = {}
 strainDictionary["sampleStrain"]={}
 strainFileName = "merged.output"
 processNumbers(strainFileName, dataDictionary, "sampleStrain", strainDictionary["sampleStrain"])
 
+<<<<<<< HEAD
 #print dataDictionary
+=======
+    
+>>>>>>> a8ff575b31751ca235ffa67aca59c233d85eb7a1
 '''def initiateReferenceDictionary(intDict, listOfFileNames, flankLengthThreshold):
     for name in listOfFileNames:
         alignmentsFile = open(name, "r")
@@ -436,6 +475,10 @@ processNumbers(strainFileName, dataDictionary, "sampleStrain", strainDictionary[
                     currentRecord = l.strip()+"$"
             else:
                 currentRecord+= l.strip()+"$"
+<<<<<<< HEAD
+=======
+
+>>>>>>> a8ff575b31751ca235ffa67aca59c233d85eb7a1
         answer = processRecord(currentRecord, flankLengthThreshold)
         key = (answer[0],answer[1])
         diction = {}
@@ -444,4 +487,8 @@ processNumbers(strainFileName, dataDictionary, "sampleStrain", strainDictionary[
         intDict[key]=diction
         alignmentsFile.close()
         print intDict
+<<<<<<< HEAD
 '''
+=======
+'''
+>>>>>>> a8ff575b31751ca235ffa67aca59c233d85eb7a1
