@@ -403,6 +403,7 @@ initRefDict(dataDictionary,listOfMergedFiles,20)
 #    print entry
 #    print dataDictionary[entry]
 
+
 strainDictionary = {}
 strainDictionary["sampleStrain"]={}
 strainFileName = "merged.output"
