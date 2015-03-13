@@ -382,20 +382,36 @@ def rightFlankTreatment(seq,threshold):
         for i in range(delta):
             toReturn += "-"
         return toReturn
-        
-dataDictionary = {}
-listOfMergedFiles = ['/home/gabdank/Documents/STR_Attempt/Simulation3/merged.output']
 
+def createChromosomeDictionary(f):
+    dict2return = {}
+    handle = open(f)
+    mone = 0
+    for l in handle:
+        dict2return[mone]=l.strip()
+        mone+=1
+    handle.close()
+    return dict2return
+    
+dataDictionary = {}
+
+chromosomeDict = createChromosomeDictionary("/media/gabdank/Disk3/mySTR/chromosomes.list")
+
+listOfMergedFiles = ['/media/gabdank/Disk3/mySTR/MY1/merged.output','/media/gabdank/Disk3/mySTR/MY2/merged.output']
  
 initRefDict(dataDictionary,listOfMergedFiles,20)
 
-# at this stage we have finished to extract all the reference information and now we should extract strain specific information
-#for entry in dataDictionary:
-#    print entry
-#    print dataDictionary[entry]
+processNumbers("/media/gabdank/Disk3/mySTR/MY1/merged.output", dataDictionary, "MY1")
+processNumbers("/media/gabdank/Disk3/mySTR/MY2/merged.output", dataDictionary, "MY2")
 
-strainFileName = "/home/gabdank/Documents/STR_Attempt/Simulation3/merged.output"
-processNumbers(strainFileName, dataDictionary, "sampleStrain")
+strainNames = ['MY1','MY2']
+
+outputFile = open("outputFile","w")
+
+lineToPrint = "chr:position\t[unit]length\t"
+for strName in strainNames:
+    lineToPrint += strName+"_length\tSTD\tlowerBound\t"
+outputFile.write(lineToPrint[:-1]+"\n")
 
 for (chromo,location) in dataDictionary:
     k = (chromo,location)
@@ -404,78 +420,40 @@ for (chromo,location) in dataDictionary:
         referenceLength = referenceData[2]*len(referenceData[1])
     else:
         referenceLength = (referenceData[2]*len(referenceData[1]))+len(referenceData[3])
-
-    strainData = dataDictionary[k]['sampleStrain']
-    exactL = strainData[0]
-    lowerL = strainData[1]
-
-    exactLengthsList = extractLengthsFromValuesList(exactL)
-    lowerLengthsList = extractLengthsFromValuesList(lowerL)    
     
-    exactArray = np.array(exactLengthsList)            
-    #lowerArray = np.array(lowerLengthsList)            
-    exactAVG = np.average(exactArray)
-    exactSTD = np.std(exactArray)
-    #lowerAVG = np.average(lowerArray)
-    #lowerSTD = np.std(lowerArray)
+    lineToPrint = chromosomeDict[int(chromo)] +":"+location+"\t["+referenceData[1]+"]"+str(referenceLength)+"\t"
     
-    #print referenceData
-    lineToPrint = chromo +":"+location+"\t["+referenceData[1]+"]"+str(referenceLength)+"\t"
-    
-    if len(exactLengthsList)>3:
-        lineToPrint += str(exactAVG)+":"+str(exactSTD)+"\t"
-    else:
-        lineToPrint += "-:-\t"
+    for strName in strainNames:   
+        if strName in dataDictionary[k]:        
+            strainData = dataDictionary[k][strName]                    
+            exactL = strainData[0]
+            lowerL = strainData[1]
         
-    interestingLower = False
-    for x in lowerLengthsList:
-        if x>referenceLength+8:
-            interestingLower=True
-    if interestingLower==True:
-        lineToPrint += "Long-Lower\t"
-    else:
-        lineToPrint += "-\t"
-    print lineToPrint
-    #print exactLengthsList
-    #print lowerLengthsList
-    #print dataDictionary[(chromo,location)].keys()
-
-    
-'''def initiateReferenceDictionary(intDict, listOfFileNames, flankLengthThreshold):
-    for name in listOfFileNames:
-        alignmentsFile = open(name, "r")
-        m = 0
-        n = 0
-        currentRecord = ""
-        for l in alignmentsFile:
-            m+=1
-            if l[0:14]=="repetitiveUnit":
-                if len(currentRecord)>0:
-                    answer = processRecord(currentRecord[0:-1], flankLengthThreshold)
-                    
-                    key = (answer[0],answer[1])
-                    print key
-                    #print currentRecord
-                    # print answer
-                    #break
-                    diction = {}
-                    refData = answer[2]
-                    diction["reference"] = refData
-                    intDict[key]=diction
-                    currentRecord = l.strip()
-                else:
-                    currentRecord = l.strip()+"$"
+            exactLengthsList = extractLengthsFromValuesList(exactL)
+            lowerLengthsList = extractLengthsFromValuesList(lowerL)    
+            
+            if (len(exactLengthsList))>0:
+                exactArray = np.array(exactLengthsList)                
+                exactAVG = np.average(exactArray)
+                exactSTD = np.std(exactArray)        
+            
+            
+            if len(exactLengthsList)>3:
+                lineToPrint += str(exactAVG)+"\t"+str(exactSTD)+"\t"
             else:
-                currentRecord+= l.strip()+"$"
+                lineToPrint += "0\t0\t"
+                
+            interestingLower = False
+            for x in lowerLengthsList:
+                if x>referenceLength+8:
+                    interestingLower=True
+            if interestingLower==True:
+                lineToPrint += "Longer\t"
+            else:
+                lineToPrint += "0\t"
+            #print lineToPrint
+        else:
+             lineToPrint += "0\t0\t0\t"
+    outputFile.write(lineToPrint+"\n")
 
-
-        answer = processRecord(currentRecord, flankLengthThreshold)
-        key = (answer[0],answer[1])
-        diction = {}
-        refData = answer[2]
-        diction["reference"] = refData
-        intDict[key]=diction
-        alignmentsFile.close()
-        print intDict
-
-'''
+outputFile.close()

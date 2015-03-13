@@ -114,7 +114,7 @@ public class kmerInformator {
 
 		while ((line=br.readLine())!=null){
 			mone++;
-			if (mone%5==0) {
+			if (mone%100==0) {
 				endTime = System.currentTimeMillis();
 				System.out.println("PROCESSED "+mone +" lines in BED, it took "+((endTime-startTime)/1000) +" seconds" );
 				startTime = endTime;

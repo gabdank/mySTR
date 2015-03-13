@@ -57,7 +57,7 @@ public class processingThread implements Runnable{
 		this.generator = generator;
 		fastq1 = fastq1File;
 		fastq2 = fastq2File;	
-		fw = new FileWriter(new File(pathOutput+id+".output"));
+		fw = new FileWriter(new File(pathOutput+id+".ou"));
 		bw = new BufferedWriter(fw); 
 	}
 
@@ -427,11 +427,10 @@ public class processingThread implements Runnable{
 				maximumsCounter++;
 			}
 		}
-		//System.out.println("------------------");		
 		
-		System.out.println("Number of maximums:"+maximumsCounter);
-		System.out.println("Maximal score = "+maximalScore);
-		System.out.println("------------------");
+		//System.out.println("Number of maximums:"+maximumsCounter);
+		//System.out.println("Maximal score = "+maximalScore);
+		//System.out.println("------------------");
 		
 		if (maximumsCounter==1 && maximalScore>=0.85){			
 			bw.write(potentialLocations.get(maximalIndex).reportTheGenomicLocation()+"{[");
