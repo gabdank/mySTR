@@ -384,7 +384,7 @@ def rightFlankTreatment(seq,threshold):
         return toReturn
         
 dataDictionary = {}
-listOfMergedFiles = ['merged.output']
+listOfMergedFiles = ['/home/gabdank/Documents/STR_Attempt/Simulation3/merged.output']
 
  
 initRefDict(dataDictionary,listOfMergedFiles,20)
@@ -394,7 +394,7 @@ initRefDict(dataDictionary,listOfMergedFiles,20)
 #    print entry
 #    print dataDictionary[entry]
 
-strainFileName = "merged.output"
+strainFileName = "/home/gabdank/Documents/STR_Attempt/Simulation3/merged.output"
 processNumbers(strainFileName, dataDictionary, "sampleStrain")
 
 for (chromo,location) in dataDictionary:
@@ -422,7 +422,7 @@ for (chromo,location) in dataDictionary:
     #print referenceData
     lineToPrint = chromo +":"+location+"\t["+referenceData[1]+"]"+str(referenceLength)+"\t"
     
-    if len(exactLengthsList)>0:
+    if len(exactLengthsList)>3:
         lineToPrint += str(exactAVG)+":"+str(exactSTD)+"\t"
     else:
         lineToPrint += "-:-\t"
@@ -436,6 +436,8 @@ for (chromo,location) in dataDictionary:
     else:
         lineToPrint += "-\t"
     print lineToPrint
+    #print exactLengthsList
+    #print lowerLengthsList
     #print dataDictionary[(chromo,location)].keys()
 
     

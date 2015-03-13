@@ -23,7 +23,7 @@ public class ThreadTest {
 			System.out.println(p+"\t"+z.get(p));
 		}*/
 		
-		processingThread t = new processingThread(5,"/home/gabdank/Documents/STR_Attempt/Simulation2/paired_dat1.fastq","/home/gabdank/Documents/STR_Attempt/Simulation2/paired_dat2.fastq", testInformator,"/home/gabdank/Documents/STR_Attempt/Simulation2/out_") ;
+		processingThread t = new processingThread(5,"/home/gabdank/Documents/STR_Attempt/Simulation3/paired_dat1.fastq","/home/gabdank/Documents/STR_Attempt/Simulation3/paired_dat2.fastq", testInformator,"/home/gabdank/Documents/STR_Attempt/Simulation3/out_") ;
 		t.run();
 	}
 }

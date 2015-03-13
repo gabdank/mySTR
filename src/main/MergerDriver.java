@@ -22,7 +22,7 @@ public class MergerDriver {
 		HashMap<KeyPair,ArrayList<String>> alignments = new HashMap<KeyPair,ArrayList<String>>();
 		HashMap<KeyPair,String> genomicLocations = new HashMap<KeyPair,String>();
 
-		File directory = new File("/home/gabdank/Documents/STR_Attempt/Simulation2/");
+		File directory = new File("/home/gabdank/Documents/STR_Attempt/Simulation3/");
 		File[] files = directory.listFiles(new Filter("ou"));
 
 		BufferedReader[]  readers = new BufferedReader[files.length];
@@ -94,7 +94,7 @@ public class MergerDriver {
 			readers[i].close();
 		}
 
-		BufferedWriter bw = new BufferedWriter(new FileWriter(new File("/home/gabdank/Documents/STR_Attempt/Simulation2/merged.output")));
+		BufferedWriter bw = new BufferedWriter(new FileWriter(new File("/home/gabdank/Documents/STR_Attempt/Simulation3/merged.output")));
 		for (KeyPair k : alignments.keySet()){
 			bw.write(genomicLocations.get(k)+"\n");
 			bw.write("{\n");			
