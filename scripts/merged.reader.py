@@ -423,6 +423,8 @@ for (chromo,location) in dataDictionary:
     
     lineToPrint = chromosomeDict[int(chromo)] +":"+location+"\t["+referenceData[1]+"]"+str(referenceLength)+"\t"
     
+    stillInteresting=False
+    
     for strName in strainNames:   
         if strName in dataDictionary[k]:        
             strainData = dataDictionary[k][strName]                    
@@ -440,20 +442,32 @@ for (chromo,location) in dataDictionary:
             
             if len(exactLengthsList)>3:
                 lineToPrint += str(exactAVG)+"\t"+str(exactSTD)+"\t"
+
+                maxExactAVG = exactAVG+exactSTD
+                minExactAVG = exactAVG-exactSTD
+                
+                
+                if (minExactAVG>referenceLength+5) or (maxExactAVG<referenceLength-5):    
+                    stillInteresting=True
             else:
                 lineToPrint += "0\t0\t"
                 
             interestingLower = False
+            oneInterestingValue = -1
             for x in lowerLengthsList:
                 if x>referenceLength+8:
                     interestingLower=True
+                    oneInterestingValue = x
             if interestingLower==True:
-                lineToPrint += "Longer\t"
+                lineToPrint += "Longer("+str(oneInterestingValue)+")\t"
+                stillInteresting=True
             else:
                 lineToPrint += "0\t"
             #print lineToPrint
         else:
              lineToPrint += "0\t0\t0\t"
-    outputFile.write(lineToPrint+"\n")
+    if stillInteresting==True:
+        outputFile.write(lineToPrint+"\n")
+        
 
 outputFile.close()
