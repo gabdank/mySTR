@@ -19,7 +19,7 @@ import domain.multiThreading.processingThread;
 public class MainDriver {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		File directory = new File("/media/gabdank/Disk3/mySTR/MY2");
+		File directory = new File("/media/gabdank/Disk3/mySTR/MY14");
 		File[] files = directory.listFiles(new Filter("fastq"));  
 		for (int index = 0; index < files.length; index++) {  
 			String filePath = files[index].toString();

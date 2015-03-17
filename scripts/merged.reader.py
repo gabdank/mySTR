@@ -397,14 +397,19 @@ dataDictionary = {}
 
 chromosomeDict = createChromosomeDictionary("/media/gabdank/Disk3/mySTR/chromosomes.list")
 
-listOfMergedFiles = ['/media/gabdank/Disk3/mySTR/MY1/merged.output','/media/gabdank/Disk3/mySTR/MY2/merged.output']
+listOfMergedFiles = ['/media/gabdank/Disk3/mySTR/MY1/merged.output','/media/gabdank/Disk3/mySTR/MY2/merged.output',
+                     '/media/gabdank/Disk3/mySTR/AB1/merged.output','/media/gabdank/Disk3/mySTR/AB3/merged.output',
+                     '/media/gabdank/Disk3/mySTR/MY6/merged.output']
  
 initRefDict(dataDictionary,listOfMergedFiles,20)
 
 processNumbers("/media/gabdank/Disk3/mySTR/MY1/merged.output", dataDictionary, "MY1")
 processNumbers("/media/gabdank/Disk3/mySTR/MY2/merged.output", dataDictionary, "MY2")
+processNumbers("/media/gabdank/Disk3/mySTR/AB1/merged.output", dataDictionary, "AB1")
+processNumbers("/media/gabdank/Disk3/mySTR/AB3/merged.output", dataDictionary, "AB3")
+processNumbers("/media/gabdank/Disk3/mySTR/MY6/merged.output", dataDictionary, "MY6")
 
-strainNames = ['MY1','MY2']
+strainNames = ['MY1','MY2','AB1','AB3','MY6']
 
 outputFile = open("outputFile","w")
 
