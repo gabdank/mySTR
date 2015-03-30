@@ -14,6 +14,7 @@ it stores for every location (chr,position) a dictioanry with key that correspon
 names. For each location we can retreive information of the refrence genome or any given strain, but
 the function will only build the refrence currently.
 '''
+from operator import itemgetter
 
 import numpy as np
 
@@ -392,6 +393,89 @@ def createChromosomeDictionary(f):
         mone+=1
     handle.close()
     return dict2return
+
+
+
+
+def printTable(rankedListOfGenomicLocations, dataDictionary,strainNames, fileName):
+    outputFile = open(fileName,"w")
+    lineToPrint = "chr:position\t[unit]length\t"
+    for strName in strainNames:
+        lineToPrint += strName+"_length\tSTD\tlowerBound\texactLengthsList\tlowerBoundLengthsList\t"
+    outputFile.write(lineToPrint[:-1]+"\n")
+
+    for (chromo,location) in rankedListOfGenomicLocations:
+        k = (chromo,location)
+        referenceData = dataDictionary[k]['reference']
+        if referenceData[3]=='ZERO':
+            referenceLength = referenceData[2]*len(referenceData[1])
+        else:
+            referenceLength = (referenceData[2]*len(referenceData[1]))+len(referenceData[3])
+        
+        lineToPrint = chromosomeDict[int(chromo)] +":"+location+"\t["+referenceData[1]+"]"+str(referenceLength)+"\t"
+        
+        stillInteresting=False
+        #print chromosomeDict[int(chromo)]
+        #if 'V'==chromosomeDict[int(chromo)] and '20064324'==location:
+        #    print "ZOPA"
+            
+        for strName in strainNames:
+            exactLengthsList = []
+            lowerLengthsList = []
+            if strName in dataDictionary[k]:        
+                strainData = dataDictionary[k][strName]                    
+                exactL = strainData[0]
+                lowerL = strainData[1]
+            
+                exactLengthsList = extractLengthsFromValuesList(exactL)
+                lowerLengthsList = extractLengthsFromValuesList(lowerL)    
+                
+                if (len(exactLengthsList))>0:
+                    exactArray = np.array(exactLengthsList)                
+                    exactAVG = np.average(exactArray)
+                    exactSTD = np.std(exactArray)        
+                
+                
+                if len(exactLengthsList)>3:
+                    lineToPrint += str(exactAVG)+"\t"+str(exactSTD)+"\t"                    
+                    maxExactAVG = exactAVG+exactSTD
+                    minExactAVG = exactAVG-exactSTD
+                                        
+                    if (minExactAVG>referenceLength+5) or (maxExactAVG<referenceLength-5):    
+                        stillInteresting=True
+                else:
+                    lineToPrint += "0\t0\t"
+                    
+                interestingLower = False
+                oneInterestingValue = -1
+                numOfLongerLowerBounds = 0
+                for x in lowerLengthsList:
+                    if x>referenceLength+8:
+                        
+                        oneInterestingValue = x
+                        numOfLongerLowerBounds += 1
+                if numOfLongerLowerBounds > 1:
+                    interestingLower=True
+                if interestingLower==True:
+                    lineToPrint += "Longer("+str(oneInterestingValue)+")\t"
+                    stillInteresting=True
+                else:
+                    lineToPrint += "0\t"
+                #print lineToPrint
+            else:
+                 lineToPrint += "0\t0\t0\t"
+            lineToPrint += str(exactLengthsList)+"\t"+str(lowerLengthsList)+"\t"
+    
+        if stillInteresting==True:
+            outputFile.write(lineToPrint+"\n")
+    outputFile.close()
+
+
+
+
+
+
+
     
 dataDictionary = {}
 
@@ -399,7 +483,8 @@ chromosomeDict = createChromosomeDictionary("/media/gabdank/Disk3/mySTR/chromoso
 
 listOfMergedFiles = ['/media/gabdank/Disk3/mySTR/MY1/merged.output','/media/gabdank/Disk3/mySTR/MY2/merged.output',
                      '/media/gabdank/Disk3/mySTR/AB1/merged.output','/media/gabdank/Disk3/mySTR/AB3/merged.output',
-                     '/media/gabdank/Disk3/mySTR/MY6/merged.output']
+                     '/media/gabdank/Disk3/mySTR/MY6/merged.output','/media/gabdank/Disk3/mySTR/MY14/merged.output',
+                     '/media/gabdank/Disk3/mySTR/MY16/merged.output']
  
 initRefDict(dataDictionary,listOfMergedFiles,20)
 
@@ -408,15 +493,86 @@ processNumbers("/media/gabdank/Disk3/mySTR/MY2/merged.output", dataDictionary, "
 processNumbers("/media/gabdank/Disk3/mySTR/AB1/merged.output", dataDictionary, "AB1")
 processNumbers("/media/gabdank/Disk3/mySTR/AB3/merged.output", dataDictionary, "AB3")
 processNumbers("/media/gabdank/Disk3/mySTR/MY6/merged.output", dataDictionary, "MY6")
+processNumbers("/media/gabdank/Disk3/mySTR/MY14/merged.output", dataDictionary, "MY14")
+processNumbers("/media/gabdank/Disk3/mySTR/MY16/merged.output", dataDictionary, "MY16")
 
-strainNames = ['MY1','MY2','AB1','AB3','MY6']
+#strainNames = ['MY1','MY2','AB1','AB3','MY6', 'MY14', 'MY16']
+strainNames = ['AB3']#,'MY2']#'AB1']
 
-outputFile = open("outputFile","w")
+#outputFile = open("outputFile","w")
 
-lineToPrint = "chr:position\t[unit]length\t"
-for strName in strainNames:
-    lineToPrint += strName+"_length\tSTD\tlowerBound\t"
-outputFile.write(lineToPrint[:-1]+"\n")
+#lineToPrint = "chr:position\t[unit]length\t"
+#for strName in strainNames:
+#    lineToPrint += strName+"_length\tSTD\tlowerBound\texactLengthsList\tlowerBoundLengthsList\t"
+#outputFile.write(lineToPrint[:-1]+"\n")
+
+
+# for a given strain I would like to order the printing table according to the deviations of the STRs
+# to do that I would go over all the STRs and collect the STR length of exact and lower and then will be able to sort by delta from reference
+# may be it is a good adea to just collect the deltas and then print out from the list of locations ordered by deltas?
+rankingStrain = 'AB3'
+rankedDictionary = []
+
+for (chromo,location) in dataDictionary:
+    k = (chromo,location)
+    referenceData = dataDictionary[k]['reference']
+    if referenceData[3]=='ZERO':
+        referenceLength = referenceData[2]*len(referenceData[1])
+    else:
+        referenceLength = (referenceData[2]*len(referenceData[1]))+len(referenceData[3]) 
+    if rankingStrain in dataDictionary[k]:  
+        delta = 0
+        exactDelta = -1
+        strainData = dataDictionary[k][rankingStrain]                    
+        exactL = strainData[0]
+        lowerL = strainData[1]
+    
+        exactLengthsList = extractLengthsFromValuesList(exactL)
+        lowerLengthsList = extractLengthsFromValuesList(lowerL)    
+        
+        if (len(exactLengthsList))>0:
+            exactArray = np.array(exactLengthsList)                
+            exactAVG = np.average(exactArray)
+            exactSTD = np.std(exactArray)        
+        
+        
+        if len(exactLengthsList)>3:
+            maxExactAVG = exactAVG+exactSTD
+            minExactAVG = exactAVG-exactSTD
+            exactDelta = max(abs(maxExactAVG-referenceLength), abs(minExactAVG-referenceLength))                  
+            delta = exactDelta
+            
+        
+
+        oneInterestingValue = -1
+        numOfLongerLowerBounds = 0
+        for x in lowerLengthsList:
+            if x>referenceLength+8:                
+                oneInterestingValue = x
+                numOfLongerLowerBounds += 1
+        if numOfLongerLowerBounds > 1:
+            delta = max(delta,abs(oneInterestingValue-referenceLength))
+            
+        # another condition - not to be added in case of c.elegans - assuming homozygocity
+        # if there is clear support to the reference length from the reads - finding of a longer lower bound ios probably erroneous
+        # so we are not going to report it
+            
+        if ((exactDelta == -1 or exactDelta>8) and delta > 0) :
+            rankedDictionary.append((k,delta))    
+
+rankedDictionary.sort(key=itemgetter(1), reverse=True)
+toPrintList = []
+for a in rankedDictionary:
+    toPrintList.append(a[0])
+
+printTable(toPrintList,dataDictionary,strainNames,"ab3.ordered")
+# printing out the table of all strains (could be ordered by ranking of a specific strain)
+
+
+
+
+
+'''
 
 for (chromo,location) in dataDictionary:
     k = (chromo,location)
@@ -430,7 +586,7 @@ for (chromo,location) in dataDictionary:
     
     stillInteresting=False
     
-    for strName in strainNames:   
+    for strName in strainNames:
         if strName in dataDictionary[k]:        
             strainData = dataDictionary[k][strName]                    
             exactL = strainData[0]
@@ -448,6 +604,7 @@ for (chromo,location) in dataDictionary:
             if len(exactLengthsList)>3:
                 lineToPrint += str(exactAVG)+"\t"+str(exactSTD)+"\t"
 
+                
                 maxExactAVG = exactAVG+exactSTD
                 minExactAVG = exactAVG-exactSTD
                 
@@ -459,10 +616,14 @@ for (chromo,location) in dataDictionary:
                 
             interestingLower = False
             oneInterestingValue = -1
+            numOfLongerLowerBounds = 0
             for x in lowerLengthsList:
                 if x>referenceLength+8:
-                    interestingLower=True
+                    
                     oneInterestingValue = x
+                    numOfLongerLowerBounds += 1
+            if numOfLongerLowerBounds > 1:
+                interestingLower=True
             if interestingLower==True:
                 lineToPrint += "Longer("+str(oneInterestingValue)+")\t"
                 stillInteresting=True
@@ -471,8 +632,12 @@ for (chromo,location) in dataDictionary:
             #print lineToPrint
         else:
              lineToPrint += "0\t0\t0\t"
+        lineToPrint += ">>"+str(exactLengthsList)+"\t"+str(lowerLengthsList)
+
     if stillInteresting==True:
         outputFile.write(lineToPrint+"\n")
-        
+    
 
 outputFile.close()
+
+'''
