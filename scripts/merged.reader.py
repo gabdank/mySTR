@@ -466,8 +466,8 @@ def printTable(rankedListOfGenomicLocations, dataDictionary,strainNames, fileNam
                  lineToPrint += "0\t0\t0\t"
             lineToPrint += str(exactLengthsList)+"\t"+str(lowerLengthsList)+"\t"
     
-        if stillInteresting==True:
-            outputFile.write(lineToPrint+"\n")
+        #if stillInteresting==True:
+        outputFile.write(lineToPrint+"\n")
     outputFile.close()
 
 
@@ -497,7 +497,7 @@ processNumbers("/media/gabdank/Disk3/mySTR/MY14/merged.output", dataDictionary, 
 processNumbers("/media/gabdank/Disk3/mySTR/MY16/merged.output", dataDictionary, "MY16")
 
 #strainNames = ['MY1','MY2','AB1','AB3','MY6', 'MY14', 'MY16']
-strainNames = ['AB3']#,'MY2']#'AB1']
+strainNames = ['MY16']#,'MY2']#'AB1']
 
 #outputFile = open("outputFile","w")
 
@@ -510,7 +510,7 @@ strainNames = ['AB3']#,'MY2']#'AB1']
 # for a given strain I would like to order the printing table according to the deviations of the STRs
 # to do that I would go over all the STRs and collect the STR length of exact and lower and then will be able to sort by delta from reference
 # may be it is a good adea to just collect the deltas and then print out from the list of locations ordered by deltas?
-rankingStrain = 'AB3'
+rankingStrain = 'MY16'
 rankedDictionary = []
 
 for (chromo,location) in dataDictionary:
@@ -520,6 +520,11 @@ for (chromo,location) in dataDictionary:
         referenceLength = referenceData[2]*len(referenceData[1])
     else:
         referenceLength = (referenceData[2]*len(referenceData[1]))+len(referenceData[3]) 
+    #print referenceData
+    #print "OLD REFERENCE LENGTH: " +str(referenceLength) + "\tnew reference length is "+str(float(referenceLength)/(len(referenceData[1])+0.0))
+    #print "-------------------"
+    #referenceLength = float(referenceLength)/(len(referenceData[1])+0.0)
+    
     if rankingStrain in dataDictionary[k]:  
         delta = 0
         exactDelta = -1
@@ -537,8 +542,8 @@ for (chromo,location) in dataDictionary:
         
         
         if len(exactLengthsList)>3:
-            maxExactAVG = exactAVG+exactSTD
-            minExactAVG = exactAVG-exactSTD
+            maxExactAVG = (exactAVG+exactSTD)
+            minExactAVG = (exactAVG-exactSTD)
             exactDelta = max(abs(maxExactAVG-referenceLength), abs(minExactAVG-referenceLength))                  
             delta = exactDelta
             
@@ -554,18 +559,18 @@ for (chromo,location) in dataDictionary:
             delta = max(delta,abs(oneInterestingValue-referenceLength))
             
         # another condition - not to be added in case of c.elegans - assuming homozygocity
-        # if there is clear support to the reference length from the reads - finding of a longer lower bound ios probably erroneous
+        # if there is clear support to the reference length from the reads - finding of a longer lower bound is probably erroneous
         # so we are not going to report it
             
-        if ((exactDelta == -1 or exactDelta>8) and delta > 0) :
-            rankedDictionary.append((k,delta))    
+        #if ((exactDelta == -1 or exactDelta>8) and delta > 0) :
+        rankedDictionary.append((k,delta))    
 
 rankedDictionary.sort(key=itemgetter(1), reverse=True)
 toPrintList = []
 for a in rankedDictionary:
     toPrintList.append(a[0])
 
-printTable(toPrintList,dataDictionary,strainNames,"ab3.ordered")
+printTable(toPrintList,dataDictionary,strainNames,"my16.ordered")
 # printing out the table of all strains (could be ordered by ranking of a specific strain)
 
 
