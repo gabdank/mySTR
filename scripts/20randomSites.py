@@ -484,7 +484,7 @@ def extractDelta(refL, strainData):
         exactSTD = np.std(exactArray)        
 
 
-    if len(exactLengthsList)>3:
+    if len(exactLengthsList)>3 and exactSTD<3:
         maxExactAVG = (exactAVG+exactSTD)
         minExactAVG = (exactAVG-exactSTD)
         exactDelta = max(abs(maxExactAVG-referenceLength), abs(minExactAVG-referenceLength))                  
@@ -572,7 +572,7 @@ for (chromo,location) in dataDictionary:
             lowerL1 = extractLengthsFromValuesList(dataDictionary[k][strainNames[0]][1])
             exactL2 = extractLengthsFromValuesList(dataDictionary[k][strainNames[1]][0])
             lowerL2 = extractLengthsFromValuesList(dataDictionary[k][strainNames[1]][1])
-            interestingLocations.append(k)
+            interestingLocations.append((k,delta1,delta2))
             #interestingLocations.append((k,strainNames[0],strainNames[1],delta1,delta2,exactL1,lowerL1,exactL2,lowerL2))            
         #delta = 0
         """
@@ -617,10 +617,29 @@ for (chromo,location) in dataDictionary:
     #if mone > 1:
     #    break
 
-print len(interestingLocations)
+#print len(interestingLocations)
 for k in random.sample(set(interestingLocations),3):
-    print chromosomeDict[int(k[0])] +":"+k[1]
-
+    
+    referenceData = dataDictionary[k[0]]['reference']
+    if referenceData[3]=='ZERO':
+        referenceLength = referenceData[2]*len(referenceData[1])
+    else:
+        referenceLength = (referenceData[2]*len(referenceData[1]))+len(referenceData[3])    
+    
+    strainData1 = dataDictionary[k[0]][strainNames[0]]                    
+    exactL1 = strainData1[0]
+    lowerL1 = strainData1[1]
+    exactLengthsList1 = extractLengthsFromValuesList(exactL1)
+    lowerLengthsList1 = extractLengthsFromValuesList(lowerL1)
+    
+    strainData2 = dataDictionary[k[0]][strainNames[1]]                    
+    exactL2 = strainData2[0]
+    lowerL2 = strainData2[1]
+    exactLengthsList2 = extractLengthsFromValuesList(exactL2)
+    lowerLengthsList2 = extractLengthsFromValuesList(lowerL2)
+    
+    print chromosomeDict[int(k[0][0])] +":"+k[0][1]+"\tRef:"+str(referenceLength)+"\n"+strainNames[0]+":"+str(k[1])+" "+str(exactLengthsList1)+str(lowerLengthsList1)+"\n"+strainNames[1]+":"+str(k[2])+" "+str(exactLengthsList2)+str(lowerLengthsList2)
+ 
 
 #toPrintList = []
 #for a in rankedDictionary:
