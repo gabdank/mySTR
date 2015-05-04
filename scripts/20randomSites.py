@@ -560,7 +560,7 @@ for (chromo,location) in dataDictionary:
         delta1 = extractDelta(referenceLength, dataDictionary[k][strainNames[0]])
         delta2 = extractDelta(referenceLength, dataDictionary[k][strainNames[1]])
         
-        if (delta1>0 and delta2>-1) or (delta1>-1 and delta2>0):
+        if (delta1>20 and delta2>-1) or (delta1>-1 and delta2>20):
             mone +=1
             #print "=========================="
             #print k            
@@ -572,6 +572,7 @@ for (chromo,location) in dataDictionary:
             lowerL1 = extractLengthsFromValuesList(dataDictionary[k][strainNames[0]][1])
             exactL2 = extractLengthsFromValuesList(dataDictionary[k][strainNames[1]][0])
             lowerL2 = extractLengthsFromValuesList(dataDictionary[k][strainNames[1]][1])
+            
             interestingLocations.append((k,delta1,delta2))
             #interestingLocations.append((k,strainNames[0],strainNames[1],delta1,delta2,exactL1,lowerL1,exactL2,lowerL2))            
         #delta = 0
@@ -618,7 +619,7 @@ for (chromo,location) in dataDictionary:
     #    break
 
 #print len(interestingLocations)
-for k in random.sample(set(interestingLocations),3):
+for k in random.sample(set(interestingLocations),20):
     
     referenceData = dataDictionary[k[0]]['reference']
     if referenceData[3]=='ZERO':
@@ -637,8 +638,9 @@ for k in random.sample(set(interestingLocations),3):
     lowerL2 = strainData2[1]
     exactLengthsList2 = extractLengthsFromValuesList(exactL2)
     lowerLengthsList2 = extractLengthsFromValuesList(lowerL2)
-    
-    print chromosomeDict[int(k[0][0])] +":"+k[0][1]+"\tRef:"+str(referenceLength)+"\n"+strainNames[0]+":"+str(k[1])+" "+str(exactLengthsList1)+str(lowerLengthsList1)+"\n"+strainNames[1]+":"+str(k[2])+" "+str(exactLengthsList2)+str(lowerLengthsList2)
+    #print referenceData
+    #print referenceData[1]
+    print "chr"+chromosomeDict[int(k[0][0])] +":"+k[0][1]+"-"+str(int(k[0][1])+referenceLength)+"\tReference_length:"+str(referenceLength)+"\t"+str(referenceData[1])+"\n"+strainNames[0]+":"+str(k[1])+" "+str(exactLengthsList1)+str(lowerLengthsList1)+"\n"+strainNames[1]+":"+str(k[2])+" "+str(exactLengthsList2)+str(lowerLengthsList2)
  
 
 #toPrintList = []
