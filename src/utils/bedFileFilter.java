@@ -48,37 +48,46 @@ public class bedFileFilter {
 				
 				System.out.println(line);
 				
-				String STR_Region = sequence.substring(startInside-1, startInside+repeatLength-1);
+				String STR_Region = sequence.substring(startInside-1, startInside+repeatLength);
 				String leftFlank = sequence.substring(0, startInside-1);
-				String rightFlank = sequence.substring(startInside+repeatLength-1);
-				System.out.println("-----------------");
-				System.out.println(STR_Region);				
-				System.out.println(leftFlank);				
-				System.out.println(rightFlank);
-				System.out.println("-----------------");
+				String rightFlank = sequence.substring(startInside+repeatLength-2);
+				//System.out.println("-----------------");
+				//System.out.println(STR_Region);				
+				//System.out.println(leftFlank);				
+				//System.out.println(rightFlank);
+				//System.out.println("-----------------");
 				
-				if (leftFlank.length()>20){
-					leftFlank = leftFlank.substring(leftFlank.length()-20);
+				if (leftFlank.length()>30){
+					leftFlank = leftFlank.substring(leftFlank.length()-30);
 					System.out.println(leftFlank);
 				}
-				if (rightFlank.length()>20){
-					rightFlank = rightFlank.substring(0,20);
+				if (rightFlank.length()>30){
+					rightFlank = rightFlank.substring(0,30);
 					System.out.println(rightFlank);
 				}
-				System.out.println("================================");
 				String combinedRepeat = leftFlank+STR_Region+rightFlank;
+				
+				System.out.println("REFERENCE:");
+				System.out.println(leftFlank+">>"+STR_Region+"<<"+rightFlank);
+				//System.out.println("COMBINED:");
+				//System.out.println(combinedRepeat);
+				System.out.println("================================");
+				
 				RepetitionList repetition1 = new RepetitionList();
 				FindRepetition find_repetition= new FindRepetition();
 				repetition1.emptyRepetitionList();
 				find_repetition.findMaximalRepetition(combinedRepeat,repetition1);
 				find_repetition.extendMaximalRepetition("sample_id", combinedRepeat, repetition1);
-				
-				//System.out.println("unit size : "+repetition1.get_max_repetition_unit_size());
-				//System.out.println("length of the repetition : "+repetition1.get_max_repetition_length());
-				// Ensure we are dealing with short tandem repeat (2..8bp long) and that the repeat length is at least 16bp long 
 				if (repetition1.get_max_repetition_unit_size()>1 && repetition1.get_max_repetition_unit_size()<9 && repetition1.get_max_repetition_length()>16){
 					String repeat1 = combinedRepeat.substring(repetition1.get_max_repetition_left_index(),repetition1.get_max_repetition_left_index()+repetition1.get_max_repetition_unit_size());
-					System.out.println("Repeat = "+repeat1);
+					//System.out.println("Repeat = "+repeat1);
+					//System.out.println(repetition1.get_max_repetition_length());
+					String repeatSection = combinedRepeat.substring(repetition1.get_max_repetition_left_index(),repetition1.get_max_repetition_right_index() );
+					
+					System.out.println(combinedRepeat.substring(0,repetition1.get_max_repetition_left_index())+"**"+repeatSection+"**"+combinedRepeat.substring(repetition1.get_max_repetition_right_index()));
+					
+					//System.out.println(start+repetition1.get_max_repetition_left_index()-leftFlank.length());
+					//System.out.println(start+repetition1.get_max_repetition_right_index()-leftFlank.length());
 				}
 				System.out.println("================================");
 					
