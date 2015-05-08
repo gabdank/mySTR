@@ -19,7 +19,7 @@ import domain.multiThreading.processingThread;
 public class MainDriver {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		File directory = new File("/media/gabdank/Disk3/mySTR/MY14");
+		File directory = new File("/media/gabdank/Disk3/mySTR/MY2");
 		File[] files = directory.listFiles(new Filter("fastq"));  
 		for (int index = 0; index < files.length; index++) {  
 			String filePath = files[index].toString();
@@ -43,7 +43,7 @@ public class MainDriver {
 
 		long time1 = System.currentTimeMillis();
 
-		kmerInformator testInformator = new kmerInformator(12, "/media/gabdank/Disk3/mySTR/chromosomes.list", "/media/gabdank/Disk3/mySTR/WS243.indexed.bed", 13);
+		kmerInformator testInformator = new kmerInformator(12, "/media/gabdank/Disk3/mySTR/chromosomes.list", "/media/gabdank/Disk3/mySTR/WS243.filtered.indexed.bed", 13);
 
 		long time2 = System.currentTimeMillis();
 		Integer threadCounter = 0;
@@ -65,7 +65,7 @@ public class MainDriver {
 			if (fileName.contains("_R1_")){
 				String file1 = fileName;
 				String file2 = fileName.replace("_R1_", "_R2_");
-				executor.execute(new processingThread(threadsCounter,directory+"/"+file1,directory+"/"+file2, testInformator,directory+"/output_") );
+				executor.execute(new processingThread(threadsCounter,directory+"/"+file1,directory+"/"+file2, testInformator,directory+"/filtered_output_") );
 				threadsCounter++;		       
 
 			}

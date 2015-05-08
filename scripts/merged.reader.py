@@ -113,11 +113,12 @@ def processNumbers(strainFile, locationsDictionary, strainName):
             if genomicSheerit!='ZERO':
                 genomicRepetitive +=genomicSheerit
                 
-                
-            #print "genomic repetative = "+genomicRepetitive
-            #print "genomic construction:"
-            #print genomicLeft + "\t" +genomicRepetitive[0:8]+"..."+genomicRepetitive[-8:]+"\t"+str(len(genomicRepetitive))+"\t"+genomicRight
-            #print "------------------------------------------------------------------------------------------"
+            #if (int(currentRecordKey[1])==15916074):                
+            #    print "genomic repetative = "+genomicRepetitive
+            print "genomic construction:"
+            print genomicLeft + "\t" +genomicRepetitive[0:8]+"..."+genomicRepetitive[-8:]+"\t"+str(len(genomicRepetitive))+"\t"+genomicRight
+            #    #print genomicLeft + "\t" +genomicRepetitive+"\t"+str(len(genomicRepetitive))+"\t"+genomicRight
+            print "---------------------------------------------------------------------------"
             # initiate two lists - for exact and for lower values:
             exactList = []
             lowerList = []            
@@ -127,16 +128,48 @@ def processNumbers(strainFile, locationsDictionary, strainName):
             localLeft = localArr[0].split(':')[1]
             localRight = localArr[1].split(':')[1]
             localRepetitive = localArr[2].split(':')[1]
-            
+            #if (int(currentRecordKey[1])==15916074):
+            #    print "-------------------------------------"
             #print "local repetitive : "+localRepetitive
-            #print localLeft+"\t"+localRepetitive[0:8]+"..."+localRepetitive[-8:]+"\t"+str(len(localRepetitive))+"\t"+localRight
+            #print ">>"+localLeft+"\t"+localRepetitive+"\t"+str(len(localRepetitive))+"\t"+localRight
+            
             localUnit = localRepetitive[0:len(genomicUnit)]
             
             leftIndex = leftAlignment(genomicLeft, localLeft)
             #print leftIndex
             rightIndex = rightAlignment(genomicRight, localRight)
             #print rightIndex
-            if leftIndex ==0:
+            #if (int(currentRecordKey[1])==15916074):
+            #    print leftIndex
+            #    print rightIndex
+            
+            # dealing with different cases
+            # constructing the right side:
+            if rightIndex < 0:
+                #cutting from the repetitive
+                combinedLocalRepetitive = localRepetitive[:rightIndex]
+                combinedLocalRight = localRepetitive[rightIndex:]+localRight
+            else: # zero or positiove 
+                #adding to the repetitive
+                if rightIndex == 0:
+                    combinedLocalRight = localRight
+                    combinedLocalRepetitive = localRepetitive
+                else:
+                    combinedLocalRepetitive = localRepetitive+ localRight[:rightIndex]
+                    combinedLocalRight = localRight[rightIndex:]
+                    
+            if leftIndex < 0:
+                combinedLocalLeft = localLeft + localRepetitive[:-leftIndex]
+                combinedLocalRepetitive = combinedLocalRepetitive[-leftIndex:]
+            else:
+                if leftIndex == 0:
+                    combinedLocalLeft = localLeft                        
+                else:
+                    combinedLocalLeft = localLeft[:-leftIndex]                   
+                    combinedLocalRepetitive = localLeft[-leftIndex:]+combinedLocalRepetitive
+            #print combinedLocalLeft+" " +combinedLocalRepetitive+" " +combinedLocalRight
+            
+            '''if leftIndex ==0:
                 if len(localLeft)<=20:
                     storedLeft = localLeft
                 else:
@@ -151,36 +184,55 @@ def processNumbers(strainFile, locationsDictionary, strainName):
                     storedLeft = shortenedLeft[-20:]
                 combinedLocalLeft = leftFlankTreatment(shortenedLeft,20) 
                 combinedLocalRepetitive = localLeft[-leftIndex:]+localRepetitive+localRight[:rightIndex] 
-            shortenedRight = localRight[rightIndex:]
-            if len(shortenedRight)<=20:
-                storedRight = shortenedRight
+            '''
+            
+            printOutLeft = leftFlankTreatment(combinedLocalLeft,20)
+            printOutRight = rightFlankTreatment(combinedLocalRight,20)
+            
+            #if (int(currentRecordKey[1])==15916074):
+            #    print "zopa "+combinedLocalRepetitive
+            
+            #shortenedRight = localRight[rightIndex:]
+            #if len(shortenedRight)<=20:
+            #    storedRight = shortenedRight
+            #else:
+            #    storedRight = shortenedRight[:20]
+            if len(combinedLocalLeft)<=20:
+                storedLeft = combinedLocalLeft
             else:
-                storedRight = shortenedRight[:20]
+                storedLeft = combinedLocalLeft[-20:]
+            if len(combinedLocalRight)<=20:
+                storedRight = combinedLocalRight
+            else:
+                storedRight = combinedLocalRight[:20]
+                
             recordToStore = (storedLeft, combinedLocalRepetitive, storedRight)
             
-            combinedLocalRight = rightFlankTreatment(localRight[rightIndex:],20)       
+            #combinedLocalRight = rightFlankTreatment(localRight[rightIndex:],20)       
             combinedRepeatLength = len(combinedLocalRepetitive)
-            #print combinedLocalLeft+"\t"+combinedLocalRepetitive[:8]+"..."+combinedLocalRepetitive[-8:]+"\t"+str(len(combinedLocalRepetitive))+"\t"+combinedLocalRight
+            #if (int(currentRecordKey[1])==15916074): 
+            print printOutLeft+"\t"+combinedLocalRepetitive[:12]+"..."+combinedLocalRepetitive[-12:]+"\t"+str(len(combinedLocalRepetitive))+"\t"+printOutRight
+            #print printOutLeft+"\t"+combinedLocalRepetitive+"\t"+printOutRight
             if len(storedLeft)<8 or len(storedRight)<8: #lower case
                 lowerList.append(recordToStore)                
             else:
                 exactList.append(recordToStore)
-            #print localAlignment(genomicLeft,genomicRepetitive,genomicRight, localLeft,localRepetitive, localRight)            
-            #print leftIndex
-            #print genomicLeft
-            #print leftFlankTreatment(localLeft[:-leftIndex],20)            
-            #print genomicRepetitive
-            #print combinedLocalRepetitive
-            #print rightIndex
-            #print genomicRight
-            #print rightFlankTreatment(localRight[rightIndex:],20)
-            #break
-            #print localUnit
-            #print localRepetitive            
-            #print localRight
-            #print localLeft
-            #print "=============================================="
-            
+            '''print localAlignment(genomicLeft,genomicRepetitive,genomicRight, localLeft,localRepetitive, localRight)
+            print leftIndex
+            print genomicLeft
+            print leftFlankTreatment(localLeft[:-leftIndex],20)
+            print genomicRepetitive
+            print combinedLocalRepetitive
+            print rightIndex
+            print genomicRight
+            print rightFlankTreatment(localRight[rightIndex:],20)
+            break
+            print localUnit
+            print localRepetitive
+            print localRight
+            print localLeft
+            print "=============================================="
+            '''
             
         if l[0]=="}": #time to put all the data in the aligned sequences into dictioanry entry
             locationsDictionary[currentRecordKey][strainName]=(exactList,lowerList)
@@ -247,15 +299,38 @@ def leftAlignment(gLeft, lLeft):
         lLeft = lLeft[-20:]
     scores = {}
     leftShortening = 0
-    while leftShortening<10:
-        x = -1
-        mone = 0
-        while x>=-len(lLeft):
-            if lLeft[x]==gLeft[x]:
-                mone += 1
-            x -= 1
-        scores[leftShortening]=mone
-        lLeft = lLeft[:-1]
+    
+    #print "genommic = "+gLeft
+    #print "local = "+lLeft    
+   
+    leftShortening = -8
+    
+    while leftShortening<8:
+        if leftShortening<0:
+
+            shortenedGenomic = gLeft[0:leftShortening]
+            #print shortenedGenomic
+
+            x = -1
+            mone = 0
+            while x>=-len(lLeft) and x>=-len(shortenedGenomic):
+                if lLeft[x]==shortenedGenomic[x]:
+                    mone += 1
+                x -= 1
+            scores[leftShortening]=mone
+            #print mone
+        else:
+            x = -1
+            mone = 0
+            while x>=-len(lLeft):
+                if lLeft[x]==gLeft[x]:
+                    mone += 1
+                x -= 1
+            scores[leftShortening]=mone
+            #print lLeft            
+            #print str(leftShortening)+"\t"+str(mone)
+            lLeft = lLeft[:-1]
+            
         leftShortening += 1
 
     maxIndex = 0
@@ -270,20 +345,36 @@ def rightAlignment(gRight, lRight):
     if len(lRight)>20:
         lRight = lRight[0:20]
     scores = {}
-    rightShortening = 0
-    while rightShortening<10:
-        x = 0
-        mone = 0
-        while x < len(lRight):
-            ##print lRight
-            #print x
-            if lRight[x]==gRight[x]:
-                mone += 1
-            x += 1
-        scores[rightShortening]=mone
-        lRight = lRight[1:]
+
+    #print "genommic = "+gRight
+    #print "local = "+lRight    
+    
+    rightShortening = -8
+    while rightShortening < 8:
+        if rightShortening<0:
+            shortenedGenomic = gRight[-(rightShortening):]
+            #print shortenedGenomic
+            x = 0
+            mone = 0
+            while x<len(lRight) and x<len(shortenedGenomic):
+                if lRight[x]==shortenedGenomic[x]:
+                    mone += 1
+                x += 1
+            scores[rightShortening]=mone
+        else:
+            x = 0
+            mone = 0
+            while x < len(lRight):
+                ##print lRight
+                #print x
+                if lRight[x]==gRight[x]:
+                    mone += 1
+                x += 1
+            scores[rightShortening]=mone
+            lRight = lRight[1:]
         rightShortening += 1
     #print scores
+
     maxIndex = 0
     maxScore = scores[0]
     for a in scores:
@@ -476,28 +567,30 @@ def printTable(rankedListOfGenomicLocations, dataDictionary,strainNames, fileNam
 
 
 
+
     
 dataDictionary = {}
 
 chromosomeDict = createChromosomeDictionary("/media/gabdank/Disk3/mySTR/chromosomes.list")
+listOfMergedFiles = ['/media/gabdank/Disk3/mySTR/MY2/merged.output']
 
-listOfMergedFiles = ['/media/gabdank/Disk3/mySTR/MY1/merged.output','/media/gabdank/Disk3/mySTR/MY2/merged.output',
-                     '/media/gabdank/Disk3/mySTR/AB1/merged.output','/media/gabdank/Disk3/mySTR/AB3/merged.output',
-                     '/media/gabdank/Disk3/mySTR/MY6/merged.output','/media/gabdank/Disk3/mySTR/MY14/merged.output',
-                     '/media/gabdank/Disk3/mySTR/MY16/merged.output']
+#listOfMergedFiles = ['/media/gabdank/Disk3/mySTR/MY1/merged.output','/media/gabdank/Disk3/mySTR/MY2/merged.output',
+#                     '/media/gabdank/Disk3/mySTR/AB1/merged.output','/media/gabdank/Disk3/mySTR/AB3/merged.output',
+#                     '/media/gabdank/Disk3/mySTR/MY6/merged.output','/media/gabdank/Disk3/mySTR/MY14/merged.output',
+#                     '/media/gabdank/Disk3/mySTR/MY16/merged.output']
  
 initRefDict(dataDictionary,listOfMergedFiles,20)
 
-processNumbers("/media/gabdank/Disk3/mySTR/MY1/merged.output", dataDictionary, "MY1")
+#processNumbers("/media/gabdank/Disk3/mySTR/MY1/merged.output", dataDictionary, "MY1")
 processNumbers("/media/gabdank/Disk3/mySTR/MY2/merged.output", dataDictionary, "MY2")
-processNumbers("/media/gabdank/Disk3/mySTR/AB1/merged.output", dataDictionary, "AB1")
-processNumbers("/media/gabdank/Disk3/mySTR/AB3/merged.output", dataDictionary, "AB3")
-processNumbers("/media/gabdank/Disk3/mySTR/MY6/merged.output", dataDictionary, "MY6")
-processNumbers("/media/gabdank/Disk3/mySTR/MY14/merged.output", dataDictionary, "MY14")
-processNumbers("/media/gabdank/Disk3/mySTR/MY16/merged.output", dataDictionary, "MY16")
+#processNumbers("/media/gabdank/Disk3/mySTR/AB1/merged.output", dataDictionary, "AB1")
+#processNumbers("/media/gabdank/Disk3/mySTR/AB3/merged.output", dataDictionary, "AB3")
+#processNumbers("/media/gabdank/Disk3/mySTR/MY6/merged.output", dataDictionary, "MY6")
+#processNumbers("/media/gabdank/Disk3/mySTR/MY14/merged.output", dataDictionary, "MY14")
+#processNumbers("/media/gabdank/Disk3/mySTR/MY16/merged.output", dataDictionary, "MY16")
 
 #strainNames = ['MY1','MY2','AB1','AB3','MY6', 'MY14', 'MY16']
-strainNames = ['MY16']#,'MY2']#'AB1']
+strainNames = ['MY2']#,'MY2']#'AB1']
 
 #outputFile = open("outputFile","w")
 
@@ -510,7 +603,8 @@ strainNames = ['MY16']#,'MY2']#'AB1']
 # for a given strain I would like to order the printing table according to the deviations of the STRs
 # to do that I would go over all the STRs and collect the STR length of exact and lower and then will be able to sort by delta from reference
 # may be it is a good adea to just collect the deltas and then print out from the list of locations ordered by deltas?
-rankingStrain = 'MY16'
+
+rankingStrain = 'MY2'
 rankedDictionary = []
 
 for (chromo,location) in dataDictionary:
@@ -570,7 +664,8 @@ toPrintList = []
 for a in rankedDictionary:
     toPrintList.append(a[0])
 
-printTable(toPrintList,dataDictionary,strainNames,"my16.ordered")
+printTable(toPrintList,dataDictionary,strainNames,"my2.ordered.updated")
+
 # printing out the table of all strains (could be ordered by ranking of a specific strain)
 
 
@@ -646,3 +741,10 @@ for (chromo,location) in dataDictionary:
 outputFile.close()
 
 '''
+
+
+
+#print rightAlignment("GCAAAGAATCAAAGACTAGA", "GCAGAGAATCAAAGACTAGAGTGGCGTATT")
+#print rightAlignment("GCAAAGAATCAAAGACTAGA","CAGAGAATCAAAGACTAGAGTGGCGTATTG")
+
+#print leftAlignment("CATATTGCGAAATTTCAGGC","AGCATATTGCGAAATTTCAGGCG")

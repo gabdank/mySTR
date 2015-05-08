@@ -21,7 +21,7 @@ public class MergerDriver {
 		
 		HashMap<KeyPair,ArrayList<String>> alignments = new HashMap<KeyPair,ArrayList<String>>();
 		HashMap<KeyPair,String> genomicLocations = new HashMap<KeyPair,String>();
-		String direct = "/media/gabdank/Disk3/mySTR/MY14/"; 
+		String direct = "/media/gabdank/Disk3/mySTR/MY2/"; 
 		File directory = new File(direct);
 		File[] files = directory.listFiles(new Filter("ou"));
 

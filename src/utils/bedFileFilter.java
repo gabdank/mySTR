@@ -48,12 +48,14 @@ public class bedFileFilter {
 				//System.out.println(repLength + "?=?"+repeatLength);
 				
 				//System.out.println(line);
-				if (startInside+repLength==769){
+				/*if (startInside+repLength==769){
 					System.out.println(line);
-					System.out.println(sequence.substring(startInside-1, startInside+repLength));
-					System.out.println((startInside-1)+"\t"+(startInside+repLength)+"\t"+sequence.length());
-				}
-				String STR_Region = sequence.substring(startInside-1, startInside+repLength);
+					System.out.println("sequence length: "+sequence.length());
+					System.out.println(startInside+repLength);
+					System.out.println(sequence.substring(startInside-1, startInside+repLength-1));
+					System.out.println((startInside-1)+"\t"+(startInside+repLength-1)+"\t"+sequence.length());
+				}*/
+				String STR_Region = sequence.substring(startInside-1, startInside+repLength-1);
 				String leftFlank = sequence.substring(0, startInside-1);
 				String rightFlank = sequence.substring(startInside+repLength-2);
 				

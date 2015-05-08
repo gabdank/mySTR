@@ -55,7 +55,7 @@ public class bedFileEnhancer {
 		
 		
 
-		BufferedReader  br = new BufferedReader(new FileReader("/media/gabdank/Disk3/mySTR/WS243.two.bed"));
+		BufferedReader  br = new BufferedReader(new FileReader("/media/gabdank/Disk3/mySTR/WS243.two.filtered.bed"));
 		//BufferedReader  br = new BufferedReader(new FileReader("trfIndexNEW1.bed"));
 		String line;
 		mone =0;
@@ -63,7 +63,7 @@ public class bedFileEnhancer {
 		System.out.println("STARTED READING BED FILE");
 
 
-		FileWriter fw1 = new FileWriter(new File("/media/gabdank/Disk3/mySTR/WS243.indexed.bed"));
+		FileWriter fw1 = new FileWriter(new File("/media/gabdank/Disk3/mySTR/WS243.filtered.indexed.bed"));
 		BufferedWriter bw1 = new BufferedWriter(fw1);
 
 
