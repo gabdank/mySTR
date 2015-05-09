@@ -15,7 +15,7 @@ public class bedFileFilter {
 
 	public static void main(String[] args) throws IOException {
 
-		BufferedReader  br = new BufferedReader(new FileReader("/home/gabdank/Documents/ElegansSTRValidation/WS243.two.bed"));
+		BufferedReader  br = new BufferedReader(new FileReader("/home/gabdank/Documents/HumanSTR/hg19.two.bed"));
 		//BufferedReader  br = new BufferedReader(new FileReader("trfIndexNEW1.bed"));
 		String line;
 		int mone =0;
@@ -23,7 +23,7 @@ public class bedFileFilter {
 		System.out.println("STARTED READING BED FILE");
 
 
-		FileWriter fw1 = new FileWriter(new File("/media/gabdank/Disk3/mySTR/WS243.two.filtered.bed"));
+		FileWriter fw1 = new FileWriter(new File("/home/gabdank/Documents/HumanSTR/hg19.two.filtered.bed"));
 		BufferedWriter bw1 = new BufferedWriter(fw1);
 
 

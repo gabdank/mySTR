@@ -19,7 +19,7 @@ import domain.multiThreading.processingThread;
 public class MainDriver {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		File directory = new File("/media/gabdank/Disk3/mySTR/MY2");
+		File directory = new File("/data5/IdanGenomeInTheBottle/");
 		File[] files = directory.listFiles(new Filter("fastq"));  
 		for (int index = 0; index < files.length; index++) {  
 			String filePath = files[index].toString();
@@ -36,14 +36,14 @@ public class MainDriver {
 
 		} 
 
-		int numberOfThreads = files.length/2;
+		int numberOfThreads = 29;//files.length/2;
 		System.out.println("Number of threads is: "+numberOfThreads);
-		System.out.println("Number of parralel jobs is: "+6);//args[0]
-		int parallel = 6;//Integer.parseInt(args[0]);
+		System.out.println("Number of parralel jobs is: "+29);//args[0]
+		int parallel = 29;//Integer.parseInt(args[0]);
 
 		long time1 = System.currentTimeMillis();
 
-		kmerInformator testInformator = new kmerInformator(12, "/media/gabdank/Disk3/mySTR/chromosomes.list", "/media/gabdank/Disk3/mySTR/WS243.filtered.indexed.bed", 13);
+		kmerInformator testInformator = new kmerInformator(12, "chromosomes.list", "hg19.filtered.indexed.bed", 29);
 
 		long time2 = System.currentTimeMillis();
 		Integer threadCounter = 0;
