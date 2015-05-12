@@ -1,5 +1,12 @@
 package domain;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashBigSet;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,8 +18,10 @@ import java.util.StringTokenizer;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
 
 public class kmerInformator {
 	private KmerMap kmerMap;
@@ -40,8 +49,12 @@ public class kmerInformator {
 
 	
 
-	private HashMap<KmerRepeatUnitPair,HashSet<GenomicLocation>> immidiateFlanksKmerRepUnit2SetOfLocations;
-	private HashMap<KmerRepeatUnitPair,HashSet<GenomicLocation>> longFlanksKmerRepUnit2SetOfLocations;
+	//private THashMap<KmerRepeatUnitPair,THashSet<GenomicLocation>> immidiateFlanksKmerRepUnit2SetOfLocations;
+	//private THashMap<KmerRepeatUnitPair,THashSet<GenomicLocation>> longFlanksKmerRepUnit2SetOfLocations;
+	
+	private Object2ObjectOpenHashMap<KmerRepeatUnitPair,ObjectOpenHashBigSet<GenomicLocation>>  immidiateFlanksKmerRepUnit2SetOfLocations;
+	private Object2ObjectOpenHashMap<KmerRepeatUnitPair,ObjectOpenHashBigSet<GenomicLocation>>  longFlanksKmerRepUnit2SetOfLocations;
+
 	
 	private TIntObjectMap<TIntIntMap> repeatUnit2ValidShortKmers; //non functional, maps that are used during construction
 	private TIntObjectMap<TIntIntMap> repeatUnit2NotValidShortKmers;//non functional, maps that are used during construction
@@ -72,8 +85,8 @@ public class kmerInformator {
 
 		repUnitIndex2ListOfLocations = new TIntObjectHashMap<ArrayList<GenomicLocation>>(10000);
 
-		immidiateFlanksKmerRepUnit2SetOfLocations = new HashMap<KmerRepeatUnitPair,HashSet<GenomicLocation>>(17000000);
-		longFlanksKmerRepUnit2SetOfLocations = new HashMap<KmerRepeatUnitPair,HashSet<GenomicLocation>>(117000000);
+		immidiateFlanksKmerRepUnit2SetOfLocations = new Object2ObjectOpenHashMap<KmerRepeatUnitPair,ObjectOpenHashBigSet<GenomicLocation>>(1000000);
+		longFlanksKmerRepUnit2SetOfLocations = new Object2ObjectOpenHashMap<KmerRepeatUnitPair,ObjectOpenHashBigSet<GenomicLocation>>(1000000);
 		// helpful maps in order to keep track of un-uniquely mapping k-mers
 		
 		repeatUnit2ValidLongKmers = new TIntObjectHashMap<TIntIntMap>();
@@ -114,9 +127,13 @@ public class kmerInformator {
 
 		while ((line=br.readLine())!=null){
 			mone++;
+			//System.out.println(mone);
 			if (mone%100==0) {
 				endTime = System.currentTimeMillis();
 				System.out.println("PROCESSED "+mone +" lines in BED, it took "+((endTime-startTime)/1000) +" seconds" );
+				System.out.println("The size of immidiate is :" + immidiateFlanksKmerRepUnit2SetOfLocations.size());
+				System.out.println("The size of long range is :" + longFlanksKmerRepUnit2SetOfLocations.size());
+
 				startTime = endTime;
 				//break;
 			}
@@ -284,12 +301,12 @@ public class kmerInformator {
 		this.numberOfThreads = numberOfThreads;
 	}
 
-	public HashMap<KmerRepeatUnitPair, HashSet<GenomicLocation>> getImmidiateFlanksKmerRepUnit2SetOfLocations() {
+	public Object2ObjectOpenHashMap<KmerRepeatUnitPair, ObjectOpenHashBigSet<GenomicLocation>> getImmidiateFlanksKmerRepUnit2SetOfLocations() {
 		return immidiateFlanksKmerRepUnit2SetOfLocations;
 	}
 
 	
-	public HashMap<KmerRepeatUnitPair, HashSet<GenomicLocation>> getLongFlanksKmerRepUnit2SetOfLocations() {
+	public Object2ObjectOpenHashMap<KmerRepeatUnitPair, ObjectOpenHashBigSet<GenomicLocation>> getLongFlanksKmerRepUnit2SetOfLocations() {
 		return longFlanksKmerRepUnit2SetOfLocations;
 	}
 
@@ -311,19 +328,19 @@ public class kmerInformator {
 		}
 	}
 	
-	private void removeKmerUnitPairFromMapping(KmerRepeatUnitPair mappingPair, HashMap<KmerRepeatUnitPair,HashSet<GenomicLocation>> mapping){
+	private void removeKmerUnitPairFromMapping(KmerRepeatUnitPair mappingPair, Object2ObjectOpenHashMap<KmerRepeatUnitPair,ObjectOpenHashBigSet<GenomicLocation>> mapping){
 		mapping.remove(mappingPair);
 	}
 	
-	private void addKmerUnitPairFromMapping(KmerRepeatUnitPair mappingPair,GenomicLocation loc, HashMap<KmerRepeatUnitPair,HashSet<GenomicLocation>>  mapping){
+	private void addKmerUnitPairFromMapping(KmerRepeatUnitPair mappingPair,GenomicLocation loc, Object2ObjectOpenHashMap<KmerRepeatUnitPair,ObjectOpenHashBigSet<GenomicLocation>>  mapping){
 		if (mapping.containsKey(mappingPair)){
-			HashSet<GenomicLocation> l1 = mapping.get(mappingPair);
+			ObjectSet<GenomicLocation> l1 = mapping.get(mappingPair);
 			if (!l1.contains(loc)){
 				l1.add(loc);
 			}
 		}
 		else{
-			HashSet<GenomicLocation> l1 = new HashSet<GenomicLocation>();
+			ObjectOpenHashBigSet<GenomicLocation> l1 = new ObjectOpenHashBigSet<GenomicLocation>();
 			l1.add(loc);
 			mapping.put(mappingPair, l1);
 		}

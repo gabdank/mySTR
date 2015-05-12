@@ -2,7 +2,13 @@ package domain.multiThreading;
 
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashBigSet;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -76,8 +82,8 @@ public class processingThread implements Runnable{
 			String id="";
 			int a = 0;
 			int b = 0;
-			HashMap<KmerRepeatUnitPair, HashSet<GenomicLocation>> shortKmerMap = generator.getImmidiateFlanksKmerRepUnit2SetOfLocations();
-			HashMap<KmerRepeatUnitPair, HashSet<GenomicLocation>> longKmerMap = generator.getLongFlanksKmerRepUnit2SetOfLocations();
+			Object2ObjectOpenHashMap<KmerRepeatUnitPair, ObjectOpenHashBigSet<GenomicLocation>> shortKmerMap = generator.getImmidiateFlanksKmerRepUnit2SetOfLocations();
+			Object2ObjectOpenHashMap<KmerRepeatUnitPair, ObjectOpenHashBigSet<GenomicLocation>> longKmerMap = generator.getLongFlanksKmerRepUnit2SetOfLocations();
 			TIntObjectMap<ArrayList<GenomicLocation>> repeatUnitLocationMap = generator.getrepUnitLocationsMap();
 			KmerMap kmerIndexMap = generator.getKmerMap();
 			RepUnitBiMap repeatIndexingMap = generator.getRepeatMap();
@@ -97,6 +103,7 @@ public class processingThread implements Runnable{
 				if (b%50000==0){
 					endTime = System.currentTimeMillis();
 					System.out.println("THREAD "+threadID+" processed "+b+" lines, (last 50000 lines in "+ (endTime-startTime)/1000 +" seconds");
+					//System.out.println("Size of ");
 					startTime = endTime;
 
 				}
@@ -146,8 +153,8 @@ public class processingThread implements Runnable{
 	}
 
 	private void processRead(String line1, String mateRead, String id,
-			HashMap<KmerRepeatUnitPair, HashSet<GenomicLocation>> shortKmerMap,
-			HashMap<KmerRepeatUnitPair, HashSet<GenomicLocation>> longKmerMap,			
+			Object2ObjectOpenHashMap<KmerRepeatUnitPair, ObjectOpenHashBigSet<GenomicLocation>> shortKmerMap,
+			Object2ObjectOpenHashMap<KmerRepeatUnitPair, ObjectOpenHashBigSet<GenomicLocation>> longKmerMap,			
 			TIntObjectMap<ArrayList<GenomicLocation>> repMap,
 			KmerMap kmerIndexMap, RepUnitBiMap repeatIndexingMap,
 			FindRepetition find_repetition, 
@@ -194,7 +201,7 @@ public class processingThread implements Runnable{
 					TIntIntMap readFlankKmers = new TIntIntHashMap(); // map that will store all kmers coming from short flanks
 					TIntIntMap readPairKmers = new TIntIntHashMap(); // map that will store all kmers from the paired End read
 
-					HashSet<GenomicLocation> kmerUnitPairLocations;
+					ObjectOpenHashBigSet<GenomicLocation> kmerUnitPairLocations;
 
 					// Going across left flank and extracting kmers from it, creating pairs with the repeatUnit and retreiving the genomic locations
 					// matching these pairs, adding 1 to each genomic location counter
